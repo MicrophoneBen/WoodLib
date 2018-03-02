@@ -34,7 +34,7 @@ public:
         delete m_pointer;  // 保证生命周期结束时自动释放
     }
 
-    SmartPointer& operator = (const SmartPointer<T>& obj)
+    SmartPointer& operator =(const SmartPointer<T>& obj)
     {
         if(this != &obj)
         {
@@ -46,12 +46,12 @@ public:
         return *this;
     }
 
-    T* operator -> ()
+    T* operator ->()
     {
         return m_pointer;
     }
 
-    T& operator * ()
+    T& operator *()
     {
         return *m_pointer;
     }

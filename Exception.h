@@ -1,6 +1,6 @@
 // Exception.h 异常类族
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#ifndef _EXCEPTION_H_
+#define _EXCEPTION_H_
 
 namespace WoodLib
 {
@@ -36,7 +36,7 @@ public:
 
     // 因为这个类发生拷贝/赋值行为时是需要进行深拷贝的，所以需要重载这两个函数
     Exception(const Exception& obj);
-    Exception& operator = (const Exception& obj);
+    Exception& operator =(const Exception& obj);
 
     virtual const char* getMessage() const;
     virtual const char* getLocation() const;
@@ -53,9 +53,9 @@ public:
 
     ArithmeticException(const ArithmeticException& obj) : Exception(obj) { }
 
-    ArithmeticException& operator = (const ArithmeticException& obj)
+    ArithmeticException& operator =(const ArithmeticException& obj)
     {
-        Exception::operator = (obj);  // 直接调用父类的赋值函数
+        Exception::operator =(obj);  // 直接调用父类的赋值函数
 
         return *this;
     }
@@ -72,9 +72,9 @@ public:
 
     NullPointerException(const NullPointerException& obj) : Exception(obj) { }
 
-    NullPointerException& operator = (const NullPointerException& obj)
+    NullPointerException& operator =(const NullPointerException& obj)
     {
-        Exception::operator = (obj);
+        Exception::operator =(obj);
 
         return *this;
     }
@@ -91,9 +91,9 @@ public:
 
     IndexOutOfBoundsException(const IndexOutOfBoundsException& obj) : Exception(obj) { }
 
-    IndexOutOfBoundsException& operator = (const IndexOutOfBoundsException& obj)
+    IndexOutOfBoundsException& operator =(const IndexOutOfBoundsException& obj)
     {
-        Exception::operator = (obj);
+        Exception::operator =(obj);
 
         return *this;
     }
@@ -110,9 +110,9 @@ public:
 
     NotEnoughMemoryException(const NotEnoughMemoryException& obj) : Exception(obj) { }
 
-    NotEnoughMemoryException& operator = (const NotEnoughMemoryException& obj)
+    NotEnoughMemoryException& operator =(const NotEnoughMemoryException& obj)
     {
-        Exception::operator = (obj);
+        Exception::operator =(obj);
 
         return *this;
     }
@@ -129,9 +129,9 @@ public:
 
     InvalidParameterException(const InvalidParameterException& obj) : Exception(obj) { }
 
-    InvalidParameterException& operator = (const InvalidParameterException& obj)
+    InvalidParameterException& operator =(const InvalidParameterException& obj)
     {
-        Exception::operator = (obj);
+        Exception::operator =(obj);
 
         return *this;
     }

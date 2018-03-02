@@ -53,7 +53,7 @@ Exception::~Exception()
     free(m_location);
 }
 
-Exception& Exception::operator = (const Exception& obj)
+Exception& Exception::operator =(const Exception& obj)
 {
     if(this != &obj)
     {
