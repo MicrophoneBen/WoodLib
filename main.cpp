@@ -1,7 +1,9 @@
-// C++异常处理示例
+// Exception 异常类族使用示例
 #include <iostream>
+#include "Exception.h"
 
 using namespace std;
+using namespace WoodLib;
 
 double Divide(double l, double r)
 {
@@ -14,7 +16,7 @@ double Divide(double l, double r)
     }
     else
     {
-        throw 0;  // 产生除0异常,将直接跳出这个函数
+        THROW_EXCEPTION(InvalidParameterException, "Divide by zero"); // 产生除0异常,将直接跳出这个函数
     }
 
     return ret;
@@ -25,25 +27,25 @@ void Demo1()
 {
     try
     {
-        throw 'a';
+        THROW_EXCEPTION(ArithmeticException, "Demo1");
     }
-    catch(int i)
+    catch(const ArithmeticException& obj)
     {
-        cout << "catch(int i)" << endl;
+        cout << "catch(const ArithmeticException& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
-    catch(double d)
+    catch(const Exception& obj)
     {
-        cout << "catch(double d)" << endl;
-    }
-    catch(char c)
-    {
-        cout << "catch(char c)" << endl;
+        cout << "catch(const Exception& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
 }
 
 void Demo2()
 {
-    throw "Demo2";
+    THROW_EXCEPTION(NotEnoughMemoryException, "Demo2");
 }
 
 int main()
@@ -55,9 +57,11 @@ int main()
         double d = Divide(1, 0);
         cout << "d = " << d << endl;
     }
-    catch(...)
+    catch(const InvalidParameterException& obj)
     {
-        cout << "Divide by zero ..." << endl;
+        cout << "catch(const InvalidParameterException& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
 
     cout << endl;
@@ -70,17 +74,23 @@ int main()
     {
         Demo2();
     }
-    catch(char* c)
+    catch(const NullPointerException& obj)
     {
-        cout << "catch(cahr* c)" << endl;
+        cout << "catch(const NullPointerException& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
-    catch(const char* c)
+    catch(const NotEnoughMemoryException& obj)
     {
-        cout << "catch(const char* c)" << endl;
+        cout << "catch(const NotEnoughMemoryException& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
-    catch(...)
+    catch(const Exception& obj)
     {
-        cout << "catch(...)" << endl;
+        cout << "catch(const Exception& obj)" << endl;
+        cout << obj.getMessage() << endl;
+        cout << obj.getLocation() << endl;
     }
 
     cout << "main() end ..." << endl;
@@ -89,10 +99,16 @@ int main()
 }
 /* 运行结果
 main() begin ...
-Divide by zero ...
+catch(const InvalidParameterException& obj)
+Divide by zero
+..\main.cpp:19
 
-catch(char c)
+catch(const ArithmeticException& obj)
+Demo1
+..\main.cpp:30
 
-catch(const char* c)
+catch(const NotEnoughMemoryException& obj)
+Demo2
+..\main.cpp:48
 main() end ...
 */
