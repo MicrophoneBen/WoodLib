@@ -1,63 +1,98 @@
+// C++异常处理示例
 #include <iostream>
-#include "SmartPointer.h"
 
 using namespace std;
-using namespace WoodLib;  // 使用我的库
 
-class Test
+double Divide(double l, double r)
 {
-public:
-    Test()
+    const double c_delta = 0.000000000000000000000001;
+    double ret = 0;
+
+    if( !((-c_delta < r) && (r < c_delta)) )
     {
-        cout << "Test" << endl;
+        ret = l/r;
+    }
+    else
+    {
+        throw 0;  // 产生除0异常,将直接跳出这个函数
     }
 
-    Test(int i, int m= 1)
-    {
-        cout << i << endl;
-    }
+    return ret;
+}
 
-    ~Test()
+// 匹配规则（自上而下，严格匹配、不进行类型转换）
+void Demo1()
+{
+    try
     {
-        cout << "~Test" << endl;
+        throw 'a';
     }
-};
+    catch(int i)
+    {
+        cout << "catch(int i)" << endl;
+    }
+    catch(double d)
+    {
+        cout << "catch(double d)" << endl;
+    }
+    catch(char c)
+    {
+        cout << "catch(char c)" << endl;
+    }
+}
+
+void Demo2()
+{
+    throw "Demo2";
+}
 
 int main()
 {
-    SmartPointer<Test> l_sp1 = new Test();
+    cout << "main() begin ..." << endl;
 
-    cout << l_sp1.isNull() << endl << endl;
+    try
+    {
+        double d = Divide(1, 0);
+        cout << "d = " << d << endl;
+    }
+    catch(...)
+    {
+        cout << "Divide by zero ..." << endl;
+    }
 
-    SmartPointer<Test> l_sp2(l_sp1);
+    cout << endl;
 
-    cout << l_sp1.isNull() << endl;
-    cout << l_sp2.isNull() << endl << endl;
+    Demo1();
 
-    SmartPointer<Test> l_sp3;
+    cout << endl;
 
-    l_sp3 = l_sp2;
+    try
+    {
+        Demo2();
+    }
+    catch(char* c)
+    {
+        cout << "catch(cahr* c)" << endl;
+    }
+    catch(const char* c)
+    {
+        cout << "catch(const char* c)" << endl;
+    }
+    catch(...)
+    {
+        cout << "catch(...)" << endl;
+    }
 
-    cout << l_sp1.isNull() << endl;
-    cout << l_sp2.isNull() << endl;
-    cout << l_sp3.isNull() << endl;
+    cout << "main() end ..." << endl;
 
     return 0;
 }
 /* 运行结果
-Test
-SmartPointer()
-0
+main() begin ...
+Divide by zero ...
 
-1
-0
+catch(char c)
 
-SmartPointer()
-1
-1
-0
-~SmartPointer()
-~Test
-~SmartPointer()
-~SmartPointer()
+catch(const char* c)
+main() end ...
 */
