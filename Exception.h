@@ -2,14 +2,16 @@
 #ifndef _EXCEPTION_H_
 #define _EXCEPTION_H_
 
+#include "Object.h"
+
 namespace WoodLib
 {
 
-// 利于移植性,不需要抛出异常时只需屏蔽掉后面就OK了
+// 利于移植性,不需要抛出异常时只需屏蔽掉后面就OK了（有些来的编译器不支持异常处理）
 #define THROW_EXCEPTION(type, message)   (throw type(message, __FILE__, __LINE__))
 
 // 异常抽象类
-class Exception
+class Exception : public Object
 {
 protected:
     char* m_message;
@@ -130,6 +132,25 @@ public:
     InvalidParameterException(const InvalidParameterException& obj) : Exception(obj) { }
 
     InvalidParameterException& operator =(const InvalidParameterException& obj)
+    {
+        Exception::operator =(obj);
+
+        return *this;
+    }
+};
+
+// 无效操作异常类（成员函数调用时，如果状态不正确则抛出异常）
+class InvalidOperationException : public Exception
+{
+public:
+    InvalidOperationException() : Exception(0) { }
+    InvalidOperationException(const char* message) : Exception(message) { }
+    InvalidOperationException(const char* file, int line) : Exception(file, line) { }
+    InvalidOperationException(const char* message, const char* file, int line) : Exception(message, file, line) { }
+
+    InvalidOperationException(const InvalidOperationException& obj) : Exception(obj) { }
+
+    InvalidOperationException& operator =(const InvalidOperationException& obj)
     {
         Exception::operator =(obj);
 

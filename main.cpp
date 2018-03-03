@@ -1,6 +1,8 @@
 // main.cpp Object类使用示例
 #include <iostream>
 #include "Object.h"
+#include "SmartPointer.h"
+#include "Exception.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -41,40 +43,89 @@ public:
 
 int main()
 {
-    Test* t1 = new Test();   // Object重载的new只是对继承自Object的类的创建有效
-    Child* c1 = new Child(); // 重载的new -> Object() -> Test() -> Child()
+    SmartPointer<Test> s = new Test();
 
-    cout << "t1 = " << t1 << endl;
-    cout << "c1 = " << c1 << endl;
+    cout << "------ 1 ------" << endl;
 
-    int* p = new int;      // 内置类型即基本类型还是使用系统的 new
-    cout << "p = " << p << endl;
+    SmartPointer<Test>* ps = &s;
 
-    delete t1;             // delete也同理
+    cout << "------ 2 ------" << endl;
 
-    delete c1;             // 先调用子类析构函数->父类析构函数->顶层父类析构函数
-                           // 再调用重载的delete运算符函数释放推内存
+    SmartPointer<Test>* ps1 = new SmartPointer<Test>();
 
-                           // 这里也就证明了作为父类的析构函数一定要提供实现,即使
-                           // 是纯虚析构函数也要提供实现，否则编译就直接报错
-    delete p;
+    cout << "------ 3 ------" << endl;
+
+    SmartPointer<Test>* ps2 = new SmartPointer<Test>(new Test);
+
+    cout << "------ 4 ------" << endl;
+
+    cout << s.isNull() << endl;
+    cout << ps->isNull() << endl;
+    cout << ps1->isNull() << endl;   // 因为ps1->m_pointer为NULL
+    cout << ps2->isNull() << endl;   // 因为ps2->m_pointer = new Test
+
+    cout << "------ 5 ------" << endl;
+
+    delete ps1;
+    cout << "------ 6 ------" << endl;
+    delete ps2;
+    //delete ps;     // 这里就会发生多重释放的问题,因为s随着main()退出
+                     // 会自动释放而ps就是指向的 s ，所以这里释放就会
+                     // 造成后面 s 释放双重释放问题
+
+                     // 结论：指向智能指针类变量的指针不需要手动释放
+                     // 但指向堆空间上面的智能指针类的指针需要手动释放
+
+                     // s 是个智能指针局部变量，ps指向的就是一个局部变量
+                     // ps1 和 ps2 指向的是指向堆上面的智能指能指针
+
+    cout << "------ 7 ------" << endl;
+
+    InvalidOperationException* e = new InvalidOperationException();
+
+    delete e;
+
+    cout << "------ 8 ------" << endl;
 
     return 0;
 }
 /* 运行结果
-Object::operator new: 8           // 包含一个指向虚函数表的指针
+Object::operator new: 8
 Test::Test()
-Object::operator new: 8          // 重载的new
-Test::Test()                     // （也调用了顶层父类的构造只不过没打印而已）Test类构造
-Child::Child()                   // 子类自己的构造
-t1 = 0x2f210b8
-c1 = 0x2f210c8
-p = 0x2f210d8
-Test::~Test()                     // 同下面分析过程
+SmartPointer()
+------ 1 ------
+------ 2 ------
+Object::operator new: 8
+SmartPointer()
+------ 3 ------
+Object::operator new: 8
+Test::Test()
+Object::operator new: 8
+SmartPointer()
+------ 4 ------
+0
+0
+1
+0
+------ 5 ------
+~SmartPointer()
 Object::~Object()
-Object::operator delete:0x2f210b8
-Child::~Child()                   // 子类析构
-Test::~Test()                     // 父类析构
-Object::~Object()                 // 顶层父类析构
-Object::operator delete:0x2f210c8 // 重载的delete
+Object::operator delete:0x2ed10c8
+------ 6 ------
+~SmartPointer()
+Test::~Test()
+Object::~Object()
+Object::operator delete:0x2ed10d8    // m_pointer指向的堆内存(Test)的释放
+Object::~Object()
+Object::operator delete:0x2ed10e8    // ps2指向的堆内存(智能指针)的释放
+------ 7 ------
+Object::operator new: 12
+Object::~Object()
+Object::operator delete:0x32210c8
+------ 8 ------
+~SmartPointer()                      // s的释放一样是ps所指向的智能指针的释放
+Test::~Test()
+Object::~Object()
+Object::operator delete:0x2ed10b8
+Object::~Object()
 */

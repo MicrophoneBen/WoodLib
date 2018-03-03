@@ -2,6 +2,7 @@
 #ifndef _SMARTPOINTER_H_
 #define _SMARTPOINTER_H_
 
+#include "Object.h"
 #include <iostream>     // 测试用后面去掉，打造库要尽量避免使用标准库
 
 using namespace std;
@@ -10,7 +11,7 @@ namespace WoodLib
 {
 
 template < typename T >
-class SmartPointer
+class SmartPointer : public Object
 {
 private:
     T* m_pointer;
@@ -38,7 +39,7 @@ public:
     {
         if(this != &obj)
         {
-            delete m_pointer;  // 赋值旧对象已经被创建存在故先释放它
+            delete m_pointer;  // 赋值时,旧对象已经被创建存在故先释放它
             m_pointer = obj.m_pointer;
             const_cast<SmartPointer<T>&>(obj).m_pointer = NULL;
         }
