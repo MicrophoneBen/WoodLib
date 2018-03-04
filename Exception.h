@@ -53,8 +53,12 @@ public:
     ArithmeticException(const char* file, int line) : Exception(file, line) { }
     ArithmeticException(const char* message, const char* file, int line) : Exception(message, file, line) { }
 
+    // 子类有重载拷贝构造函数时，一定需要调用父类的拷贝构造以构造父类成员
+    // 注意调用父类拷贝构造不能在函数体中执行，这样只是产生一个临时的父类对象，不是真正的父类
+    // 只有在初始化列表中调用的父类拷贝构造才是真正的父类
     ArithmeticException(const ArithmeticException& obj) : Exception(obj) { }
 
+    // 子类有重载赋值函数时，赋值运算也必须要调用父类的赋值运算，对父类成员赋值，只能在函数体中调用
     ArithmeticException& operator =(const ArithmeticException& obj)
     {
         Exception::operator =(obj);  // 直接调用父类的赋值函数

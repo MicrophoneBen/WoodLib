@@ -37,6 +37,11 @@ public:
         return ret;
     }
 
+    bool insert(const T& element)  // 重载insert() 实现尾部插入
+    {
+        insert(m_length, element);
+    }
+
     bool remove(int index)
     {
         bool ret = (0 <= index) && (index < m_length);

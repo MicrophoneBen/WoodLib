@@ -10,7 +10,12 @@ namespace WoodLib
 template < typename T >
 class List : public Object
 {
+protected:
+    List(const List<T>& obj);
+    List<T>& operator =(const List<T>& obj);
+
 public:
+    List() { }
     virtual bool insert(int index, const T& element) = 0;  // 插入
     virtual bool remove(int index) = 0;                    // 删除
     virtual bool set(int index, const T& element) = 0;     // 设置
