@@ -1,4 +1,4 @@
-// main.cpp StaticList类和DynamicList类的使用示例
+// main.cpp StaticArray类和DynamicArray类的使用示例
 #include <iostream>
 #include "DynamicArray.h"
 #include "StaticArray.h"
@@ -52,7 +52,7 @@ int main()
 d1.length() = 5
 0 1 2 3 4
 Parameter index is invalid ...
-..\Array.h:59
+..\Array.h:61
 Object::~Object()
 d1.length() = 10
 0 1 2 3 4 64644 41405056 41353408 1 0

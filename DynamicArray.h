@@ -13,21 +13,77 @@ class DynamicArray : public Array<T>
 private:
     int m_length;
 
-public:
-    DynamicArray(int length)
+#if 0
+    // 对象构造时的初始化操作
+    // 产生程序崩溃的代码
+    void init(T* array, int len)    
     {
-        // 1. 分配新内存
-        this->m_array = new T[length];
 
-        // 2. 设置变量
-        if( this->m_array != NULL )
+        array = new T[len];        // arry临时变量,并不是真正的this->m_array  
+
+        if( array != NULL )
         {
-            m_length = length;
+            m_length = len;
         }
         else
         {
-            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to create DynamicArray Object ...");
+            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to init Object ...");
         }
+    }
+#endif
+    // 对象构造时的初始化操作
+    void init(T* array, int len)
+    {
+        if( array != NULL )
+        {
+            this->m_array = array;
+            m_length = len;
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to init Object ...");
+        }
+    }
+
+    // 分配内存并拷贝数组
+    T* copy(T* array, int len, int newLen)
+    {
+        T* ret = new T[newLen];
+
+        if( array != NULL )
+        {
+            int size = (len < newLen) ? len : newLen;
+
+            for(int i=0; i<size; i++)
+            {
+                ret[i] = array[i];
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to copy Object ...");
+        }
+
+        return ret;
+    }
+
+    // 将指定的堆空间设置为内部存储数组
+    void updata(T* array, int len)
+    {
+        // 先设置变量，再删除 确保异常安全！
+        T* tmp = this->m_array;
+
+        this->m_array = array;
+        m_length = len;
+
+        delete[] tmp;
+    }
+
+public:
+    DynamicArray(int length)
+    {
+        //init(this->m_array, length);   // 产生程序运行崩溃的代码
+        init(new T[length], length);
     }
 
     ~DynamicArray()
@@ -38,24 +94,7 @@ public:
     // 重载拷贝构造
     DynamicArray(const DynamicArray<T>& obj)
     {
-        // 1. 分配新内存
-        this->m_array = new T[obj.length()];
-
-        if( this->m_array != NULL )
-        {
-            // 2. 拷贝数组
-            for(int i=0; i<obj.length(); i++)
-            {
-                this->m_array[i] = obj.m_array[i];
-            }
-
-            // 3.设置变量（如长度信息）
-            m_length = obj.m_length;
-        }
-        else
-        {
-            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to DyanmicArray Object ...");
-        }
+        init(copy(obj.m_array, obj.m_length, obj.m_length), obj.length());
     }
 
     // 重载赋值操作
@@ -63,29 +102,7 @@ public:
     {
         if( this != &obj )
         {
-            // 1. 分配新内存
-            T* array = new T[obj.length()];
-
-            if( array != NULL )
-            {
-                // 2. 拷贝数组
-                for(int i=0; i<obj.length(); i++)
-                {
-                    array[i] = obj.m_array[i];
-                }
-
-                // 3. 设置变量
-                T* tmp = this->m_array;  // 先设置参数，再删除m_array以确保异常安全
-
-                this->m_array = array;
-                m_length = obj.length();
-
-                delete tmp[];           // 注意指向的是个数组
-            }
-            else
-            {
-                THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to DyanmicArray Object ...");
-            }
+            updata(copy(this->m_array, m_length, obj.length()), obj.length());
         }
 
         return *this;
@@ -95,31 +112,7 @@ public:
     {
         if( length != m_length )
         {
-            // 1.分配新内存
-            T* array = new T[length];
-
-            if( array != NULL )
-            {
-                int len = length < m_length ? length : m_length;
-
-                // 2. 拷贝数组
-                for(int i=0; i<len; i++)
-                {
-                    array[i] = this->m_array[i];  
-                }
-
-                // 3. 设置变量
-                T* tmp = this->m_array;  // 先设置参数，再删除m_array以确保异常安全
-
-                this->m_array = array;
-                m_length = length;
-
-                delete tmp[];            // 注意指向的是个数组
-            }
-            else
-            {
-                THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to resize DynamicArray Object ...");
-            }
+            updata(copy(this->m_array, m_length, length), length);
         }
     }
 
