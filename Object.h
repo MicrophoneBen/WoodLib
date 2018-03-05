@@ -15,6 +15,11 @@ public:
     void* operator new[](unsigned int size) throw();
     void operator delete[](void* p);
 
+    // 考虑其子类要比较两个对象是否相等，重载之(重载==运算符)！
+    // 注意是对继承本类的子类，不是对泛型类型
+    bool operator ==(const Object& obj);
+    bool operator !=(const Object& obj);
+
     // 纯虚函数就会有虚函数表,保证继承此类的子类都能使用动态类型识别技术
     virtual ~Object() = 0;
 };

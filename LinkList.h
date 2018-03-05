@@ -129,6 +129,83 @@ public:
         return ret;
     }
 
+    void reverse()   // 链表反转
+    {
+#if 0
+        // 方法一：充分利用现有的 position()
+        // 思想：每次取最后一个依次插入
+        for(int i=0; i < m_length-1; i++)
+        {
+            Node* end = position(m_length-1);
+
+            end->next->next = position(i)->next;
+
+            position(i)->next = end->next;
+
+            end->next = NULL;
+        }
+#else
+        // 方法二：不用现有函数，完全独立   // O(n)
+        // 思想：从节点0按链表顺序逐个反转，最后与头结点挂接
+        Node* curr = m_header.next;
+        Node* pre = NULL;
+        Node* nex = NULL;
+
+        while(curr != NULL)
+        {
+            nex = curr->next;  // 保存当前位置的后继结点的指针
+
+            curr->next = pre;  // 反转操作
+
+            pre = curr;        // 更新pre指针
+
+            curr = nex;        // 更新curr指针
+        }
+
+        m_header.next = pre;   // 与头结点挂接
+
+#endif
+    }
+
+    int find(const T element) const    // O(n)
+    {
+#if 0
+        int ret = -1;
+
+        for(int i=0; i<m_length; i++)
+        {
+            if( (position(i)->next)->value == element )
+            {
+                ret = i;
+                break;
+            }
+        }
+
+        return ret;
+#else
+        // 这个比上面效率高一些
+        int ret = -1;
+
+        Node* node = m_header.next;
+        int i = 0;
+
+        while( node != NULL )
+        {
+            if( node->value == element )
+            {
+                ret = i;
+                break;
+            }
+
+            node = node->next;
+
+            i++;
+        }
+
+        return ret;
+#endif
+    }
+
     bool set(int index, const T& element)
     {
         bool ret = ( (0 <= index) && (index < m_length) );
@@ -203,6 +280,5 @@ public:
 };
 
 }
-
 
 #endif

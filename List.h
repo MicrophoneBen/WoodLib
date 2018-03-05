@@ -18,6 +18,7 @@ public:
     List() { }
     virtual bool insert(int index, const T& element) = 0;  // 插入
     virtual bool remove(int index) = 0;                    // 删除
+    virtual int find(const T element) const = 0;           // 查找
     virtual bool set(int index, const T& element) = 0;     // 设置
     virtual bool get(int index, T& element) const = 0;     // 获取
     virtual int length() const = 0;                        // 长度
