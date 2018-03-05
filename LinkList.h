@@ -5,17 +5,13 @@
 #include "List.h"
 #include "Exception.h"
 
-#include "iostream"
-
-using namespace std;
-
 namespace WoodLib
 {
 
 template < typename T >
 class LinkList : public List<T>
 {
-private:
+protected:
     // 结点类型（内部类，C++中struct也是类）
     // 因为可能需要涉及到T类型对象创建,那么就有可能需要new,故也要继承自Object
     struct Node : public Object
@@ -72,6 +68,17 @@ private:
         return ret;
     }
 
+    // vitual 封装节点创建和销毁函数，用多态技术区分父类和子类的new 和 delete
+    virtual Node* creatNode()
+    {
+        new Node();
+    }
+
+    virtual void destroyNode(Node* pn)
+    {
+        delete pn;
+    }
+
 public:
     LinkList()
     {
@@ -85,15 +92,23 @@ public:
 
         if( ret )
         {
-            Node* node = new Node();
-            node->value = element;
+            Node* node = creatNode();
 
-            Node* current = position(index);
+            if( node != NULL )
+            {
+                node->value = element;
 
-            node->next = current->next;
-            current->next = node;
+                Node* current = position(index);
+                node->next = current->next;
+                current->next = node;
 
-            m_length++;
+                m_length++;
+            }
+            else
+            {
+                THROW_EXCEPTION(NotEnoughMemoryException, "No memrey to insert new element ...");
+            }
+
         }
         else
         {
@@ -120,7 +135,7 @@ public:
 
             current->next = toDel->next;
 
-            delete toDel;
+            destroyNode(toDel);
 
             m_length--;
         }
@@ -322,7 +337,7 @@ public:
 
             m_header.next = toDel->next;
 
-            delete toDel;
+            destroyNode(toDel);
         }
 
         m_length = 0;
