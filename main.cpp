@@ -51,9 +51,9 @@ int main()
         list.insert(i);
     }
 
-    for(int i=0; i<list.length(); i++)
+    for(list.move(0); !list.isEnd(); list.next())
     {
-        cout << list.get(i) << " ";
+        cout << list.current() << " ";
     }
 
     cout << endl;
@@ -62,9 +62,9 @@ int main()
 
     list.reverse();
 
-    for(int i=0; i<list.length(); i++)    // 单链表的遍历时间复杂度是 O(n*n)，不是线性的，效率太低
+    for(list.move(0); !list.isEnd(); list.next())    // 这样就是线性遍历了,时间复杂度 O(n)
     {
-        cout << list.get(i) << " ";
+        cout << list.current() << " ";
     }
 
     cout << endl;

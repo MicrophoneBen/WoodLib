@@ -41,9 +41,12 @@ private:
     {
         char reserved[sizeof(T)];
         Node* next;
-    }m_header;      // LinkList<T>在构造时会创建这个成员变量
+    }m_header;        // LinkList<T>在构造时会创建这个成员变量
 
-    int m_length;   // 链表长度
+    int m_length;     // 链表长度
+
+    Node* m_current;  // 保存当前游标所代表的结点地址
+    int m_step;       // 游标每步移动的长度
 
     // 找到指向第 [index] 结点的前一个结点的指针
     // 譬如：index==0 ==> ret==头结点； index==5 ==> ret==第[4]个结点的地址；
@@ -252,6 +255,58 @@ public:
         {
             THROW_EXCEPTION(IndexOutOfBoundsException, "Parameter index is invalid ...");
         }
+    }
+
+    // 游标设置到index位置 以后游标每次移动step的长度，默认为游标步长为1
+    bool move(int index, int step = 1)
+    {
+        bool ret = (0 <= index) && (index < m_length);
+        ret = ret && (0 < step) && (step < m_length);
+
+        if( ret )
+        {
+            m_current = position(index)->next;
+            m_step = step;
+        }
+        else
+        {
+            THROW_EXCEPTION(IndexOutOfBoundsException, "Parameter is invalid ...");
+        }
+
+        return ret;
+    }
+
+    // 检测是否到链表尾结点
+    bool isEnd()
+    {
+        return (m_current == NULL);
+    }
+
+    // 返回当前结点中数据域的值
+    T current()
+    {
+        if( !isEnd() )
+        {
+            return m_current->value;
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidOperationException, "No value at current position ...");
+        }
+    }
+
+    // 移动游标到下一个结点(执行一次这个函数游标移动 m_step 个结点)
+    bool next()
+    {
+        int i = 0;
+
+        while( (i < m_step) && !isEnd() )
+        {
+            m_current = m_current->next;
+            i++;
+        }
+
+        return (i == m_step);
     }
 
     int length() const
