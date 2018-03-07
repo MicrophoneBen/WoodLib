@@ -19,4 +19,6 @@ HEADERS += \
     StaticArray.h \
     DynamicArray.h \
     LinkList.h \
-    StaticLink.h
+    StaticLink.h \
+    Pointer.h \
+    SharedPointer.h
