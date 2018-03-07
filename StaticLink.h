@@ -75,6 +75,8 @@ private:
             {
                 psn->~SNode();     // 手动调用析构函数清理空间
                 m_used[i] = false;
+
+                break;             // 都归还了没必要还for循环
             }
         }
     }
@@ -92,10 +94,13 @@ public:
     {
         return N;
     }
+
+    ~StaticLink()
+    {
+        this->clear();
+    }
 };
 
 }
-
-
 
 #endif

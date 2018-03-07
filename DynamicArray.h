@@ -80,7 +80,7 @@ private:
     }
 
 public:
-    DynamicArray(int length)
+    DynamicArray(int length = 0)
     {
         //init(this->m_array, length);   // 产生程序运行崩溃的代码
         init(new T[length], length);

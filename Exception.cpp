@@ -2,20 +2,25 @@
 #include "Exception.h"
 #include <cstring>
 #include <cstdlib>    // 虽然是使用了标准库，但这个很容易就可以用c库替换就OK了
+#include <cstdio>
 
 namespace WoodLib
 {
 
 void Exception::init(const char* message, const char* file, int line)
 {
-    m_message = strdup(message);     // strdup()内部会调用malloc申请堆内存
-                                     // 不要直接赋值，直接赋值是不安全的
+    // strdup()内部会调用malloc申请堆内存,不要直接赋值，直接赋值是不安全的
+    // 传递给strdup()函数的参数若是NULL将会引发段错误；
+    // strdup()函数内部没有对传参是NULL的检查，所以这里自己检查NULL；
+    m_message = message ? strdup(message) : NULL;
 
     if(file != NULL)
     {
         char l_s[16] = {0};
 
-        itoa(line, l_s, 10); // 将整数line转为字符串,其中的10表示转换为十进制格式
+        //itoa(line, l_s, 10); // 将整数line转为字符串,其中的10表示转换为十进制格式
+        //itoa()函数不具有可移植性，到linux的g++下面就编译报错了
+        snprintf(l_s, sizeof(l_s), "%d", line);
 
         // 注意:申请内存失败时无须再抛NotEnoughMemoryException异常,从宏观上
         // 看，父类是无法抛出子类型的异常的。

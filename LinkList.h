@@ -71,7 +71,7 @@ protected:
     // vitual 封装节点创建和销毁函数，用多态技术区分父类和子类的new 和 delete
     virtual Node* creatNode()
     {
-        new Node();
+        return new Node();
     }
 
     virtual void destroyNode(Node* pn)
@@ -135,9 +135,18 @@ public:
 
             current->next = toDel->next;
 
-            destroyNode(toDel);
-
             m_length--;
+
+            // 当删除的结点恰好是游标m_current指着的结点时,将游标
+            // 手动的移到toDel->next,这样游标就始终指着一个有效结点
+            if( toDel == m_current )
+            {
+                m_current = m_current->next;
+            }
+
+            // delete toDel; 如果Node析构中抛异常时会出现异常不安全行
+            // 为必须保证其之后的--m_length移动在该句之前,以保证异常安全
+            destroyNode(toDel);
         }
         else
         {
@@ -337,10 +346,10 @@ public:
 
             m_header.next = toDel->next;
 
+            m_length--;        // 保证异常安全
+
             destroyNode(toDel);
         }
-
-        m_length = 0;
     }
 
     ~LinkList()
