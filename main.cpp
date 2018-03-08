@@ -1,103 +1,65 @@
-// main.cpp 代码阶段测试并优化
+// main.cpp 循环单链表解决约瑟夫环问题
 #include <iostream>
-#include "SmartPointer.h"
-#include "SharedPointer.h"
+#include "CircleList.h"
 
 using namespace std;
 using namespace WoodLib;
 
-class Test : public Object
+// 有n(n>0)个人，从s(s>0)开始计数，数到m的自杀
+void Josephus(int n, int s, int m)
 {
-public:
-    int m_i;
+    CircleList<int> c1;
 
-public:
-    Test(int i = 0) : m_i(i)
+    // 给 n 个人编号,从 1 开始编号的,可随意设置起始号码(结点数据区存放的编号)
+    for(int i=0; i < n; i++)
     {
-        cout << "Test::Test()" << endl;
+        c1.insert(i+1);  // 从 1 开始编号的
     }
 
-    ~Test()
+    // 遍历形式上面变得复杂了，因为循环链表没有一个专门的结束标志
+    c1.move(0);
+
+    for(int i = 0; i < c1.length(); c1.next())
     {
-        cout << "Test::~Test()" << endl;
+
+        cout << c1.current() << " ";
+        i++;
     }
 
-    void print()
+    cout << endl << endl;
+
+    c1.move(s-1, m-1);
+
+    int i = 0;
+    while(c1.length() > 0)
     {
-        cout << "m_i = " << m_i << endl;
+        c1.next();
+        cout << "(" << (++i) << ")" << c1.current() << " ";  // 自杀的人的编号
+        c1.remove(c1.find(c1.current()));   // 移除自杀的的人
+
+        if( i % 7 == 0 )           // 控制格式用的
+        {
+            cout << endl;
+        }
     }
 
-    void setMi(int i)
-    {
-        m_i = i;
-    }
-};
+    cout << endl << endl;
+}
 
 int main()
 {
-    Test* pt1 = new Test(0);
-    cout << "pt1 = " << pt1 << endl;
-    pt1->print();
-
-    SmartPointer<Test> ps1(pt1);
-    ps1->setMi(100);             // 智能指针调用所指向的类中的函数
-
-    ps1->print();
-    cout << "ps1.get() = " << ps1.get() << endl;
-    cout << "ps1.isNull() = " << ps1.isNull() << endl;
-    cout << endl;
-
-    SmartPointer<Test> ps2(ps1);
-
-    cout << "ps1.get() = " << ps1.get() << endl;
-    cout << "ps2.get() = " << ps2.get() << endl;
-    cout << "ps1.isNull() = " << ps1.isNull() << endl;
-    cout << "ps2.isNull() = " << ps2.isNull() << endl;
-    cout << endl;
-
-    Test* pt2 = new Test();
-    Test* pt3 = new Test();
-
-    SharedPointer<Test> ps3 = pt2;
-    SharedPointer<Test> ps4(pt3);
-
-    cout << "ps3 == ps4 ==> :" << (ps3 == ps4) << endl;
-    cout << "ps3.get() = " << ps3.get() << endl;
-    cout << "ps4.get() = " << ps4.get() << endl;
-
-    ps4 = ps3;
-
-    cout << "ps3 == ps4 ==> :" << (ps3 == ps4) << endl;
-    cout << "ps3.get() = " << ps3.get() << endl;
-    cout << "ps4.get() = " << ps4.get() << endl;
-
-    //const SharedPointer<Test> ps5 = new Test();
-    //ps5->m_i = 1;  // error 说明与原生指针一样const对象不能作为左值
+    Josephus(41, 1, 3);
 
     return 0;
 }
 /* 运行结果
-Test::Test()
-pt1 = 0x26f10b8
-m_i = 0
-m_i = 100
-ps1.get() = 0x26f10b8
-ps1.isNull() = 0
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41
 
-ps1.get() = 0
-ps2.get() = 0x26f10b8
-ps1.isNull() = 1
-ps2.isNull() = 0
+(1)3 (2)6 (3)9 (4)12 (5)15 (6)18 (7)21
+(8)24 (9)27 (10)30 (11)33 (12)36 (13)39 (14)1
+(15)5 (16)10 (17)14 (18)19 (19)23 (20)28 (21)32
+(22)37 (23)41 (24)7 (25)13 (26)20 (27)26 (28)34
+(29)40 (30)8 (31)17 (32)29 (33)38 (34)11 (35)25
+(36)2 (37)22 (38)4 (39)35 (40)16 (41)31
 
-Test::Test()
-Test::Test()
-ps3 == ps4 ==> :0
-ps3.get() = 0x26f10c8
-ps4.get() = 0x26f10d8
-Test::~Test()
-ps3 == ps4 ==> :1
-ps3.get() = 0x26f10c8
-ps4.get() = 0x26f10c8
-Test::~Test()
-Test::~Test()
 */

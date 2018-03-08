@@ -83,6 +83,8 @@ public:
     LinkList()
     {
         m_header.next = NULL;
+        m_current = NULL;
+        m_step = 1;
         m_length = 0;
     }
 
@@ -118,7 +120,7 @@ public:
         return ret;
     }
 
-    bool insert(const T& element)   // 尾部插入
+    virtual bool insert(const T& element)   // 尾部插入
     {
         insert(m_length, element);
     }
@@ -156,7 +158,7 @@ public:
         return ret;
     }
 
-    void reverse()   // 链表反转
+    virtual void reverse()   // 链表反转
     {
 #if 0
         // 方法一：充分利用现有的 position()
@@ -267,7 +269,7 @@ public:
     }
 
     // 上面函数操作很不方便，重载一个这样的出来
-    T get(int index) const
+    virtual T get(int index) const
     {
         T ret;
 
@@ -282,7 +284,7 @@ public:
     }
 
     // 游标设置到index位置 以后游标每次移动step的长度，默认为游标步长为1
-    bool move(int index, int step = 1)
+    virtual bool move(int index, int step = 1)
     {
         bool ret = (0 <= index) && (index < m_length);
         ret = ret && (0 < step) && (step < m_length);
@@ -301,13 +303,13 @@ public:
     }
 
     // 检测是否到链表尾结点
-    bool isEnd()
+    virtual bool isEnd()
     {
         return (m_current == NULL);
     }
 
     // 返回当前结点中数据域的值
-    T current()
+    virtual T current()
     {
         if( !isEnd() )
         {
@@ -320,7 +322,7 @@ public:
     }
 
     // 移动游标到下一个结点(执行一次这个函数游标移动 m_step 个结点)
-    bool next()
+    virtual bool next()
     {
         int i = 0;
 
