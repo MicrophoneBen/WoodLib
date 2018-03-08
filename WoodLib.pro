@@ -24,4 +24,5 @@ HEADERS += \
     SharedPointer.h \
     CircleList.h \
     DualLinkList.h \
-    LinuxList.h
+    LinuxList.h \
+    DualCircleLinkList.h
