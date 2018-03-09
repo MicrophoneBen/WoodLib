@@ -1,4 +1,4 @@
-// main.cpp 顺序队列使用示例
+// main.cpp 链式队列（组合linux内核双向链表类）使用示例
 #include <iostream>
 #include "LinKQueue.h"
 
@@ -43,7 +43,7 @@ int main()
 
     cout << endl << "queue is Empty ==> " << queue.isEmpty() << endl;
 
-    // 测试2： 顺序队列的缺陷
+    // 测试2
     cout << endl;
 
     LinkQueue<Test> queue2;   // 链式队列就没有构造函数的调用了
