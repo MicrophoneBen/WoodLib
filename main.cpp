@@ -1,6 +1,6 @@
-// main.cpp 链式队列（组合linux内核双向链表类）使用示例
+// main.cpp  StackToQueue类 用栈实现队列使用示例
 #include <iostream>
-#include "LinKQueue.h"
+#include "StackToQueue.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -21,7 +21,7 @@ public:
 
 int main()
 {
-    LinkQueue<int> queue;
+    StackToQueue<int> queue;
 
     cout << "queue is Empty ==> " << queue.isEmpty() << endl;
 
@@ -46,7 +46,7 @@ int main()
     // 测试2
     cout << endl;
 
-    LinkQueue<Test> queue2;   // 链式队列就没有构造函数的调用了
+    StackToQueue<Test> queue2;   // 链式队列就没有构造函数的调用了
 
     return 0;
 }
@@ -56,5 +56,4 @@ queue.enQueue() : 0 1 2 3 4
 queue is Empty ==> 0
 queue.deQueue() : 0 1 2 3 4
 queue is Empty ==> 1
-
 */
