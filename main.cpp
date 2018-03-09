@@ -1,6 +1,6 @@
-// main.cpp  StackToQueue类 用栈实现队列使用示例
+// main.cpp  QueueToStack类 用队列实现栈的使用示例
 #include <iostream>
-#include "StackToQueue.h"
+#include "QueueToStack.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -21,39 +21,48 @@ public:
 
 int main()
 {
-    StackToQueue<int> queue;
+    QueueToStack<Test> l1;    // 没有构造函数的调用
 
-    cout << "queue is Empty ==> " << queue.isEmpty() << endl;
+    cout << "l1.size() = " << l1.size() << endl << endl;
 
-    cout << "queue.enQueue() : ";
-    for(int i=0; i < 5; i++)
+    QueueToStack<int> l2;
+
+    try
     {
-        cout << i << " ";
-        queue.enQueue(i);
+        l2.pop();
+    }
+    catch(const Exception& e)
+    {
+        cout << e.getMessage() << endl;
+        cout << e.getLocation() << endl;
     }
 
-    cout << endl << "queue is Empty ==> " << queue.isEmpty() << endl;
-
-    cout << "queue.deQueue() : ";
-    while( queue.length() > 0 )
+    cout << "l2.push(): ";
+    for(int i=0; i<10; i++)
     {
-        cout << queue.front() << " ";
-        queue.deQueue();
+        cout << i*i << " ";
+        l2.push(i*i);
     }
 
-    cout << endl << "queue is Empty ==> " << queue.isEmpty() << endl;
+    cout << endl << "l2.size() = " << l2.size() << endl;
 
-    // 测试2
+    cout << "l2.pop(): ";
+    while( l2.size() > 0 )
+    {
+        cout << l2.top() << " ";
+        l2.pop();
+    }
+
     cout << endl;
-
-    StackToQueue<Test> queue2;   // 链式队列就没有构造函数的调用了
 
     return 0;
 }
 /* 运行结果
-queue is Empty ==> 1
-queue.enQueue() : 0 1 2 3 4
-queue is Empty ==> 0
-queue.deQueue() : 0 1 2 3 4
-queue is Empty ==> 1
+l1.size() = 0
+
+No element in current stack ...
+..\QueueToStack.h:78
+l2.push(): 0 1 4 9 16 25 36 49 64 81
+l2.size() = 10
+l2.pop(): 81 64 49 36 25 16 9 4 1 0
 */
