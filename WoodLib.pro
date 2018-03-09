@@ -30,4 +30,5 @@ HEADERS += \
     StaticStack.h \
     LinkStack.h \
     Queue.h \
-    StaticQueue.h
+    StaticQueue.h \
+    LinkQueue.h

@@ -1,11 +1,11 @@
 // main.cpp 顺序队列使用示例
 #include <iostream>
-#include "StaticQueue.h"
+#include "LinKQueue.h"
 
 using namespace std;
 using namespace WoodLib;
 
-class Test
+class Test : public Object
 {
 public:
     Test()
@@ -21,12 +21,12 @@ public:
 
 int main()
 {
-    StaticQueue<int, 5> queue;
+    LinkQueue<int> queue;
 
     cout << "queue is Empty ==> " << queue.isEmpty() << endl;
 
     cout << "queue.enQueue() : ";
-    for(int i=0; i < queue.capacity(); i++)
+    for(int i=0; i < 5; i++)
     {
         cout << i << " ";
         queue.enQueue(i);
@@ -46,7 +46,7 @@ int main()
     // 测试2： 顺序队列的缺陷
     cout << endl;
 
-    StaticQueue<Test, 5> queue2;   // 与顺序栈一样的缺陷，后面用链式队列解决
+    LinkQueue<Test> queue2;   // 链式队列就没有构造函数的调用了
 
     return 0;
 }
@@ -57,14 +57,4 @@ queue is Empty ==> 0
 queue.deQueue() : 0 1 2 3 4
 queue is Empty ==> 1
 
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
 */
