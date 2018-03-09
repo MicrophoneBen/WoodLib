@@ -1,11 +1,11 @@
-// StaticStack 基于顺序存储结构栈的使用示例
+// LinkStack 基于链式存储结构栈（简称链式栈）的使用示例
 #include <iostream>
-#include "StaticStack.h"
+#include "LinkStack.h"
 
 using namespace std;
 using namespace WoodLib;
 
-class Test
+class Test : public Object
 {
 public:
     Test()
@@ -21,44 +21,49 @@ public:
 
 int main()
 {
-    StaticStack<Test, 10> s1;
+    LinkStack<Test> l1;    // 没有构造函数的调用
 
-    // 顺序栈的严重缺陷，创建顺序栈对象时，若栈中存储的数据元素是类类型时
-    // 会调用N次构造函数，对象销毁时又会调用N次析构函数。明明没有压栈，但
-    // 却也会发生N次构造N次析构，这样效率是很底下的；
+    cout << "l1.size() = " << l1.size() << endl << endl;
 
-    // 原因就是因为顺序栈是使用原生数组作为存储空间的，所以栈对象在创建时
-    // 数组的各个元素肯定也有个初始化的过程，当数组类型为类类型时自然就会
-    // 调用构造函数了，销毁时自然也就会调用析构函数了！
+    LinkStack<int> l2;
 
-    // 问题根源就在于顺序栈的这个存储空间会随着对象的创建而每个数组元素都
-    // 初始化一遍，从这入手，那么我用链表来作为存储空间这个问题不就迎刃而解
-    // 了吗！---> 这就是链式栈了！
+    try
+    {
+        l2.pop();
+    }
+    catch(const Exception& e)
+    {
+        cout << e.getMessage() << endl;
+        cout << e.getLocation() << endl;
+    }
 
-    cout << "s1.size() = " << s1.size() << endl;
+    cout << "l2.push(): ";
+    for(int i=0; i<10; i++)
+    {
+        cout << i*i << " ";
+        l2.push(i*i);
+    }
+
+    cout << endl << "l2.size() = " << l2.size() << endl;
+
+    cout << "l2.pop(): ";
+    while( l2.size() > 0 )
+    {
+        cout << l2.top() << " ";
+        l2.pop();
+    }
+
+    cout << endl;
 
     return 0;
 }
+
 /* 运行结果
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-Test::Test()
-s1.size() = 0
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
-Test::~Test()
+l1.size() = 0
+
+No element in current stack ...
+..\LinkStack.h:37
+l2.push(): 0 1 4 9 16 25 36 49 64 81
+l2.size() = 10
+l2.pop(): 81 64 49 36 25 16 9 4 1 0
 */
