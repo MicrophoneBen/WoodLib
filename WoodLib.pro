@@ -5,7 +5,8 @@ CONFIG -= qt
 
 SOURCES += main.cpp \
     Exception.cpp \
-    Object.cpp
+    Object.cpp \
+    WoodString.cpp
 
 HEADERS += \
     SmartPointer.h \
@@ -33,4 +34,5 @@ HEADERS += \
     StaticQueue.h \
     LinkQueue.h \
     StackToQueue.h \
-    QueueToStack.h
+    QueueToStack.h \
+    WoodString.h
