@@ -23,6 +23,19 @@ void String::init(const char* str)
     }
 }
 
+bool String::equal(const char* l, const char* r, unsigned int len) const
+{
+    bool ret = (len > 0);
+
+    for(unsigned int i=0; i < len && ret; i++)  // 因为len是unsigned int类型的
+    {
+        // 逐个比对，一有不相等直接跳出 for 循环
+        ret = ret && (l[i] == r[i]);
+    }
+
+    return ret;
+}
+
 String::String()
 {
     init("");
@@ -54,6 +67,145 @@ int String::length() const
 const char* String::str() const
 {
     return m_str;
+}
+
+char& String::operator[](int index)
+{
+    return m_str[index];
+}
+
+char String::operator[](int index) const
+{
+    return m_str[index];
+}
+
+bool String::startWith(const char* s) const
+{
+    int len = strlen(s);
+    bool ret = (s != NULL) && (len < m_length);  // 先对传参s进行检测
+
+    if( ret )
+    {
+        ret = equal(m_str, s, len);
+    }
+    else
+    {
+        THROW_EXCEPTION(InvalidParameterException, "Parameter s is invalid ...");
+    }
+
+    return ret;
+}
+
+bool String::startWith(const String& s) const
+{
+    return (s.m_str);
+}
+
+bool String::endOf(const char* s) const
+{
+    int len = strlen(s);
+    bool ret = (s != NULL) && (len < m_length);
+
+    if( ret )
+    {
+        char* str = m_str + (m_length - len);  // 获取待比较位置的地址
+
+        ret = equal(str, s, len);
+    }
+    else
+    {
+        THROW_EXCEPTION(InvalidParameterException, "Parameter s is invalid ...");
+    }
+
+    return ret;
+}
+
+bool String::endOf(const String& s) const
+{
+    return (s.m_str);
+}
+
+String& String::insert(int index, const char* s)
+{
+    if( (0 <= index) && (index <= m_length) )
+    {
+        int len = strlen(s);
+
+        if( (s != NULL) && (len > 0) )
+        {
+            char* str = static_cast<char*>(malloc(m_length + len + 1));
+
+            if( str != NULL )   // 堆空间申请成功
+            {
+                // 1. 拷贝 m_str 的前 index 个字符放入新空间开始的位置
+                strncpy(str, m_str, index);
+                // 2. 将 s 放入第 index+1 的位置
+                strncpy(str + index, s, len);
+                // 3. 将 m_str 剩余的部分紧接着放入新空间
+                strncpy(str + index + len, m_str + index, m_length - index);
+
+                str[m_length + len] = '\0';
+
+                char* tmp = m_str;   // 保证异常安全
+                m_str = str;
+                m_length += len;
+                free(tmp);
+            }
+            else
+            {
+                THROW_EXCEPTION(NotEnoughMemoryException, "No memory to insert string value ...");
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Parameter s is invalid ...");
+        }
+    }
+    else
+    {
+        THROW_EXCEPTION(IndexOutOfBoundsException, "Paramter index is invalid ...");
+    }
+
+    return *this;
+}
+
+String& String::insert(int index, const String& s)
+{
+    return (insert(index, s.m_str));
+}
+
+String& String::trim()
+{
+    int front_count = 0;            // 字符串头最前面非空格字符的位置
+    int rear_count = m_length - 1;  // 字符串尾最后一个非空格字符的位置
+
+    while( ' ' == m_str[front_count] )
+    {
+        front_count++;
+    }
+
+    while( ' ' == m_str[rear_count] )
+    {
+        rear_count--;
+    }
+
+    if( 0 == front_count )            // 字符串前端无空格的情况
+    {
+        m_str[rear_count + 1] = '\0';
+        m_length = rear_count + 1;
+    }
+    else                              // 字符串前端有空格
+    {
+        for(int i=0,j=front_count; j < rear_count+1; i++,j++)
+        {
+            m_str[i] = m_str[j];
+        }
+
+        m_length = rear_count - front_count + 1;
+        m_str[rear_count - front_count + 1] = '\0';
+    }
+
+    return *this;
 }
 
 /* 比较操作符重载函数 */

@@ -5,67 +5,46 @@
 using namespace std;
 using namespace WoodLib;
 
-void test1()
-{
-    cout << "test1() begin..." << endl;
-
-    String s;
-
-    s = 'L';
-
-    cout << s.str() << endl;         // L
-    cout << s.length() << endl;      // 1
-    cout << (s == 'L') << endl;      // 1
-    cout << (s > "M") << endl;       // 0 字典顺序比较
-
-    s += "i yao";
-
-    cout << s.str() << endl;         // Li yao
-    cout << s.length() << endl;      // 6
-    cout << (s == "Li yao") << endl; // 1
-
-    cout << "test1() end..." << endl;
-}
-
-void test2()
-{
-    cout << "test2() begin..." << endl;
-
-    String a[] = {"E", "D", "C", "B", "A"};
-    String min = a[0];
-
-    // 找出最小的字符
-    for(unsigned int i=0; i<sizeof(a)/sizeof(a[0]); i++)
-    {
-        if( min > a[i] )
-        {
-            min = a[i];
-        }
-    }
-
-    cout << min.str() << endl;   // A
-
-    cout << "test2() end..." << endl;
-}
-
 int main()
 {
-    test1();
-    test2();
+    String s = "abc1234";
+
+    cout << "s.length() = " << s.length() << endl;
+
+    cout << "s.startWith(\"abc\") : " <<  s.startWith("abc") << endl;
+    cout << "s.startWith(\"adc\") : " <<  s.startWith("adc") << endl;
+    cout << "s.endOf(\"234\") : " <<  s.endOf("234") << endl;
+    cout << "s.endOf(\"56\") : " <<  s.endOf("56") << endl;
+
+    for(int i=0; i < s.length(); i++)
+    {
+        cout << s[i];
+    }
+
+    cout << endl;
+
+    s.insert(0, "   Hello ");
+    s.insert(s.length(), " Liyao     ");
+
+    cout << "s.str() = [" << s.str() << "]" << endl;
+    cout << "s.length() = " << s.length() << endl;
+
+    s.trim();
+
+    cout << "s.str() = [" << s.str() << "]" << endl;
+    cout << "s.length() = " << s.length() << endl;
 
     return 0;
 }
 /* 运行结果
-test1() begin...
-L
-1
-1
-0
-Li yao
-6
-1
-test1() end...
-test2() begin...
-A
-test2() end...
+s.length() = 7
+s.startWith("abc") : 1
+s.startWith("adc") : 0
+s.endOf("234") : 1
+s.endOf("56") : 0
+abc1234
+s.str() = [   Hello abc1234 Liyao     ]
+s.length() = 27
+s.str() = [Hello abc1234 Liyao]
+s.length() = 19
 */

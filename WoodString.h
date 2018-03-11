@@ -15,6 +15,7 @@ private:
     int m_length;   // 字符串长度
 
     void init(const char* str);
+    bool equal(const char* l, const char* r, unsigned int len) const;
 
 public:
     String();
@@ -23,7 +24,17 @@ public:
     String(char c);
 
     int length() const;
-    const char* str() const;
+    const char* str() const;   // 获取字符串
+
+    char& operator[](int index);
+    char operator[](int index) const;
+    bool startWith(const char* s) const;    // 判断是否以s开头
+    bool startWith(const String& s) const;
+    bool endOf(const char* s) const;        // 判断是否以s结尾
+    bool endOf(const String& s) const;
+    String& insert(int index, const char* s);   // const对象不能改变肯定也不能够插入
+    String& insert(int index, const String& s);
+    String& trim();    // 去掉两端空格字符
 
     /* 比较操作符重载函数 */
     bool operator==(const String& s) const;
