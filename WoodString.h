@@ -18,6 +18,10 @@ private:
     bool equal(const char* l, const char* r, unsigned int len) const;
 
 public:
+    static int* makePMT(const char* substr);               // 生成部分匹配表 PMT
+    static int KMP(const char* dest, const char* substr);  // KMP算法查找子串index
+
+public:
     String();
     String(const char* s);
     String(const String& s);   // 拷贝构造
@@ -25,6 +29,17 @@ public:
 
     int length() const;
     const char* str() const;   // 获取字符串
+
+    int find(const char* substr) const;
+    int find(const String& s) const;
+    String& remove(int index, int len);                      // 在字符串中将指定子串删除
+    String& remove(const char* s);
+    String& remove(const String& s);
+    String& replace(const char* dest, const char* substr);   // 子串替换
+    String& replace(const char* dest, const String& substr);
+    String& replace(const String& dest, const char* substr);
+    String& replace(const String& dest, const String& substr);
+    String creatSubstr(int index, int len) const;            // 从字符中创建子串
 
     char& operator[](int index);
     char operator[](int index) const;
@@ -56,6 +71,12 @@ public:
     String operator+(const char* s) const;
     String& operator+=(const String& s);
     String& operator+=(const char* s);
+
+    /* 减法操作符重载函数 */
+    String operator -(const String& s) const;
+    String operator -(const char* s) const;
+    String& operator -=(const String& s);
+    String& operator -=(const char* s);
 
     /* 赋值操作符重载函数 */
     String& operator=(const String& s);

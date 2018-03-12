@@ -1,3 +1,4 @@
+// String.cpp 
 #include "WoodString.h"
 #include "Exception.h"
 #include <cstring>
@@ -36,6 +37,89 @@ bool String::equal(const char* l, const char* r, unsigned int len) const
     return ret;
 }
 
+// KMP算法： O(n) = len_dest + len_substr
+// 返回值：部分匹配表，在堆上申请的内存空间
+int* String::makePMT(const char* substr)
+{
+    int len = strlen(substr);
+
+    // 不要忘记乘以 sizeof(int)
+    int* PMT = static_cast<int*>(malloc(sizeof(int) * len));
+
+    if( PMT != NULL )
+    {
+        int PMT_element = 0;  // 部分匹配表中的元素值
+        PMT[0] = 0;           // 1、下标为 0 的元素 匹配值为 0
+
+        // 2、从 2 个字符开始递推（从下标为 1 的字符开始递推）
+        for(int i=1; i<len; i++)
+        {
+            // 4、当前缀与后缀向后拓展的字符不相等时, 匹配值到退至表中上一个元素值
+            // 直至再次 判断相等，或者 匹配值 已经为 0 时；
+            while( (PMT_element > 0) && (substr[PMT_element] != substr[i]) )
+            {
+                PMT_element = PMT[PMT_element - 1];
+            }
+
+            // 3、前缀与后缀向后拓展的字符相等时, 匹配值加1
+            if( substr[PMT_element] == substr[i] )
+            {
+                PMT_element++;
+            }
+
+            PMT[i] = PMT_element;  // 将部分匹配值填入表中
+        }
+    }
+
+    return PMT;
+}
+
+int String::KMP(const char* dest, const char* substr)
+{
+    int ret = -1;
+
+    int len_dest = strlen(dest);
+    int len_substr = strlen(substr);
+
+    int* PMT = makePMT(substr);
+
+    if( PMT != NULL )
+    {
+        for(int i=0,j=0; i<len_dest; i++)  // 目标串查找完毕跳出 for 循环
+        {
+            while( (j > 0) && (substr[j] != dest[i]) )
+            {
+                // 失配时，移动 j 到当前已经匹配了的子串的部分匹配值的位置
+                // 。如果仍然失配， j 继续照上面规则忘前移动， 直到匹配或 j
+                // 到达了子串开始的位置
+                j = PMT[j-1];
+            }
+
+            if(substr[j] == dest[i])
+            {
+                j++;
+            }
+
+            if( j == len_substr )  // 目标串中有子串,已经匹配完找到了时
+            {
+                ret = i + 1 - len_substr;  // 同一维度计算
+                break;
+            }
+        }
+    }
+    else
+    {
+        THROW_EXCEPTION(InvalidOperationException, "Nor exising normally PMT ...");
+    }
+
+    free(PMT);   // pmt 指向的是 make_pmt()申请的堆内存,所以得free
+                 // free释放其他函数中申请的堆内存,这个设计不好！！！
+                 // 能否改进一下？
+                 // 不需要改进，类比strdup()也是这样！
+
+    return ret;
+}
+
 String::String()
 {
     init("");
@@ -67,6 +151,110 @@ int String::length() const
 const char* String::str() const
 {
     return m_str;
+}
+
+int String::find(const char* substr) const
+{
+    return KMP(m_str, substr ? substr : "");
+}
+
+int String::find(const String& s) const
+{
+    return find(s.m_str);
+}
+
+String& String::remove(int index, int len)
+{
+    if( (0 <= index) && (index < m_length) && (len > 0))
+    {
+        int m = index + len;
+
+        while( m < m_length )
+        {
+            m_str[index++] = m_str[m++];
+        }
+
+        m_str[index] = '\0';
+        m_length = index;
+    }
+    else
+    {
+        THROW_EXCEPTION(IndexOutOfBoundsException, "Parameter index is invalid ...");
+    }
+
+    return *this;
+}
+
+String& String::remove(const char* substr)
+{
+    return remove(find(substr), substr ? strlen(substr) : 0);
+}
+
+String& String::remove(const String& s)
+{
+    return remove(find(s), s.length());
+}
+
+String& String::replace(const char* dest, const char* substr)
+{
+    int index = find(dest);     // 1. 找到字符串 dest 在目标串中的位置
+
+    if( index >= 0 )            // find() 没有找到时返回值 -1
+    {
+        remove(dest);           // 2. 先删除 dest
+        insert(index, substr);  // 3. 在 index 位置插入 substr
+    }
+
+    return *this;
+}
+
+String& String::replace(const char* dest, const String& subst)
+{
+    return replace(dest, subst.m_str);
+}
+
+String& String::replace(const String& dest, const char* substr)
+{
+    return replace(dest.m_str, substr);
+}
+
+String& String::replace(const String& dest, const String& subst)
+{
+    return replace(dest.m_str, subst.m_str);
+}
+
+// 在目标串中的 index 下标出提取出长度为 len 的子串
+String String::creatSubstr(int index, int len) const
+{
+    String ret;
+
+    if( (0 <= index) && (index < m_length) && (len > 0))
+    {
+        if( (index + len) > m_length )
+        {
+            len = m_length - index;   // 归一化 将超过目标串的归一于最大到目标串末尾
+        }
+
+        char* str = static_cast<char*>(malloc(sizeof(char) * len + 1));
+
+        if( str != NULL )
+        {
+            strncpy(str, m_str + index, len);
+            str[len] = '\0';
+
+            ret = str;   // 调用String的传参为 const char* 的 =函数,其中有对原来m_str堆内存的释放；
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to creat string ...");
+        }
+    }
+    else
+    {
+        THROW_EXCEPTION(IndexOutOfBoundsException, "Parameter is invalid ...");
+    }
+
+    return ret;
 }
 
 char& String::operator[](int index)
@@ -317,6 +505,31 @@ String& String::operator+=(const char* s)
     // 通过定义实现，如 a += b; ==>a = a + b;
     // + 和 = 调用的是 const char* 传参版本的
     return *this = *this + s;
+}
+
+/* 减法操作符重载函数 */
+String String::operator -(const String& s) const
+{
+    return String(*this).remove(s.m_str);
+}
+
+String String::operator -(const char* s) const
+{
+    // String(*this) 利用构造器产生一个和当前对象一样的
+    // 临时字符串,这样也就不会改变目标串
+    // 再调用 remove(s)删除子串 不就实现了减法了吗
+    return String(*this).remove(s);
+}
+
+String& String::operator -=(const String& s)
+{
+    // 注意这个与上面不一样,这个是自身是要改变的
+    return remove(s.m_str);
+}
+
+String& String::operator -=(const char* s)
+{
+    return remove(s);
 }
 
 /* 赋值操作符重载函数 */
