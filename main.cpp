@@ -1,9 +1,11 @@
-// main.cpp  将问题分解：规模为n-1与n是一样逻辑，这样的问题就可以用递归求解
+// main.cpp  利用递归思想 进行 回溯算法的设计
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include "QueenSolution.h"
 
 using namespace std;
+using namespace WoodLib;
 
 // 递归实现单向链表反转
 struct Node
@@ -121,6 +123,22 @@ Node* merge(Node* list1, Node* list2)
     return ret;
 }
 
+// 逆序打印单链表中的偶数结点
+void printRevese(Node* list)
+{
+    if(list != NULL)
+    {
+        // 深度搜索，直到最后一个节点
+        printRevese(list->next);
+
+        // 回溯算法设计：上一行递归结束，开始回溯并判断节点的值是否为偶数
+        if(list->value % 2 == 0)
+        {
+            cout << list->value << " ";
+        }
+    }
+}
+
 // 汉诺塔 将 n 个木块 由 a 借助 b 移动到 c
 void HanoiTower(int n, char a, char b, char c)
 {
@@ -166,64 +184,65 @@ void permutation(char* s, char* e)
 
 int main()
 {
-    // 测试1：无头结点的单向链表反转
-    Node* list = creatList(1, 5);
+    // 测试1：逆序打印单链表中的偶数结点
+    Node* list = creatList(1, 10);
 
-    printList(list);            // 1->2->3->4->5->NULL:
-    printList(reverse(list));   // 5->4->3->2->1->NULL
+    printList(list);
+    printRevese(list);
 
-    cout << endl;
+    cout << endl << endl;
 
-    // 测试2：无头结点的单向链表反转
-    Node* list1 = creatList(1, 5);
-    Node* list2 = creatList(-2, 5);
-
-    printList(list1);
-    printList(list2);
-    printList(merge(list1, list2));
-
-    cout << endl;
-
-    // 测试3：汉诺塔
-    HanoiTower(3, 'a', 'b', 'c');
-
-    cout << endl;
-
-    // 测试4：全排列问题
-    char s1[] = "abc";
-    permutation(s1, s1);
-
-    cout << endl;
-
-    char s2[] = "aba";
-    permutation(s2, s2);
+    // 测试2：八皇后解决方案
+    QueenSolution<8> qs;
+    qs.solve();
 
     return 0;
 }
 /* 运行结果
-[1]->[2]->[3]->[4]->[5]->NULL
-[5]->[4]->[3]->[2]->[1]->NULL
+[1]->[2]->[3]->[4]->[5]->[6]->[7]->[8]->[9]->[10]->NULL
+10 8 6 4 2
 
-[1]->[2]->[3]->[4]->[5]->NULL
-[-2]->[-1]->[0]->[1]->[2]->NULL
-[-2]->[-1]->[0]->[1]->[1]->[2]->[2]->[3]->[4]->[5]->NULL
+(0, 0) (4, 1) (7, 2) (5, 3) (2, 4) (6, 5) (1, 6) (3, 7)
+...#....
+.#......
+......#.
+..#.....
+.....#..
+.......#
+....#...
+#.......
 
-a-->c
-a-->b
-c-->b
-a-->c
-b-->a
-b-->c
-a-->c
+(0, 0) (5, 1) (7, 2) (2, 3) (6, 4) (3, 5) (1, 6) (4, 7)
+....#...
+.#......
+...#....
+......#.
+..#.....
+.......#
+.....#..
+#.......
 
-abc
-acb
-bac
-bca
-cba
-cab
+(0, 0) (6, 1) (3, 2) (5, 3) (7, 4) (1, 5) (4, 6) (2, 7)
+..#.....
+....#...
+.#......
+.......#
+.....#..
+...#....
+......#.
+#.......
 
-aba
-aab
-baa
+中间还有88种方案的棋盘省略不列出来了...
+
+(7, 0) (3, 1) (0, 2) (2, 3) (5, 4) (1, 5) (6, 6) (4, 7)
+....#...
+......#.
+.#......
+.....#..
+..#.....
+#.......
+...#....
+.......#
+
+total : 92
 */
