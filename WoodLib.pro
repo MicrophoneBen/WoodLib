@@ -36,4 +36,5 @@ HEADERS += \
     StackToQueue.h \
     QueueToStack.h \
     WoodString.h \
-    QueenSolution.h
+    QueenSolution.h \
+    Sort.h

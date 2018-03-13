@@ -1,70 +1,39 @@
-// main.cpp  排序基本概念
+// main.cpp  选择排序和插入排序
 #include <iostream>
-#include "Object.h"
+#include "Sort.h"
 
 using namespace std;
 using namespace WoodLib;
 
-// 多关键字比较
-struct Test : public Object
-{
-public:
-    int key1;
-    int key2;
-
-    Test(int k1, int k2)
-    {
-        key1 = k1;
-        key2 = k2;
-    }
-
-    bool operator ==(const Test& t)
-    {
-        return (key1 == t.key1) && (key2 == t.key2);
-    }
-
-    bool operator !=(const Test& t)
-    {
-        return !(*this == t);
-    }
-
-    bool operator <(const Test& t)
-    {
-        // 注意两种情况，用“||” 连接
-        // key1 的比较优先于 key2 的比较（利用 || 的短路法则）,这就是多关键字的比较
-        return (key1 < t.key1) || ((key1 == t.key1) && (key2 < t.key2));
-    }
-
-    bool operator >=(const Test& t)
-    {
-        return !(*this < t);
-    }
-
-    bool operator >(const Test& t)
-    {
-        // 注意两种情况，用“||” 连接
-        // key1 的比较优先于 key2 的比较（利用 || 的短路法则）,这就是多关键字的比较
-        return (key1 > t.key1) || ((key1 == t.key1) && (key2 > t.key2));
-    }
-
-    bool operator <=(const Test& t)
-    {
-        return !(*this > t);
-    }
-};
-
 int main()
 {
-    Test t1(3, 4);
-    Test t2(2, 5);
-    Test t3(3, 5);
+    int array1[] = {8, 1, 0, 10, 99, 55, 12, 16};
+    int len1 = sizeof(array1) / sizeof(array1[0]);
 
-    cout << (t1 > t2) << endl;  // 输出： 1
-    cout << (t1 < t3) << endl;  // 输出： 1
+    Sort::selectSort(array1, len1);   // static成员函数直接通过类名调用
+
+    for(int i=0; i<len1; i++)
+    {
+        cout << array1[i] << " ";
+    }
+
+    cout << endl;
+
+    int array2[] = {8, 1, 0, 10, 99, 55, 12, 16};
+    int len2 = sizeof(array2) / sizeof(array2[0]);
+
+    Sort::insertSort(array2, len2, false);
+
+    for(int i=0; i<len2; i++)
+    {
+        cout << array2[i] << " ";
+    }
+
+    cout << endl;
 
     return 0;
 }
 /* 运行结果
-1
-1
+0 1 8 10 12 16 55 99
+99 55 16 12 10 8 1 0
 */
