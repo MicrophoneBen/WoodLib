@@ -1,32 +1,75 @@
-// main.cpp  归并排序、快速排序使用示例
+// main.cpp  排序类与数组类的关系，数组类中直接调用排序方法对数组内元素进行排序
 #include <iostream>
-#include "Sort.h"
+#include "StaticArray.h"
+#include "DynamicArray.h"
 
 using namespace std;
 using namespace WoodLib;
 
 int main()
 {
-    int array1[] = {8, 8, 16, 10, 99, 8, 8, 8};
-    int len1 = sizeof(array1) / sizeof(array1[0]);
+    // 静态数组类对象
+    StaticArray<int, 5> s_array;
 
-    Sort::quickSort(array1, len1);   // static成员函数直接通过类名调用
-
-    for(int i=0; i<len1; i++)
+    for(int i=0; i<s_array.length(); i++)
     {
-        cout << array1[i] << " ";
+        s_array[i] = rand() % 100;   // 产生100以内的随机数
+    }
+
+    for(int i=0; i<s_array.length(); i++)
+    {
+        cout << s_array[i] << " ";
     }
 
     cout << endl;
 
-    int array2[] = {8, 8, 16, 10, 99, 8, 8, 8};
-    int len2 = sizeof(array2) / sizeof(array2[0]);
+    s_array.bubbleSort();    // 冒泡排序（顺序）
 
-    Sort::quickSort(array2, len2, false);
-
-    for(int i=0; i<len2; i++)
+    for(int i=0; i<s_array.length(); i++)
     {
-        cout << array2[i] << " ";
+        cout << s_array[i] << " ";
+    }
+
+    cout << endl;
+
+    s_array.quickSort(false);  // 快速排序（逆序）
+
+    for(int i=0; i<s_array.length(); i++)
+    {
+        cout << s_array[i] << " ";
+    }
+
+    cout << endl << endl;
+
+    // 动态数组类对象
+    DynamicArray<int> d_array(5);
+
+    for(int i=0; i<d_array.length(); i++)
+    {
+        d_array[i] = rand() % 100;
+    }
+
+    for(int i=0; i<d_array.length(); i++)
+    {
+        cout << d_array[i] << " ";
+    }
+
+    cout << endl;
+
+    d_array.insertSort();    // 插入排序（顺序）
+
+    for(int i=0; i<d_array.length(); i++)
+    {
+        cout << d_array[i] << " ";
+    }
+
+    cout << endl;
+
+    d_array.mergeSort(false);  // 归并排序（逆序）
+
+    for(int i=0; i<d_array.length(); i++)
+    {
+        cout << d_array[i] << " ";
     }
 
     cout << endl;
@@ -34,6 +77,11 @@ int main()
     return 0;
 }
 /* 运行结果
-8 8 8 8 8 10 16 99
-99 16 10 8 8 8 8 8
+41 67 34 0 69
+0 34 41 67 69
+69 67 41 34 0
+
+24 78 58 62 64
+24 58 62 64 78
+78 64 62 58 24
 */

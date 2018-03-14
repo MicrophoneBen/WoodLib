@@ -3,6 +3,7 @@
 
 #include "Object.h"
 #include "Exception.h"
+#include "Sort.h"
 
 namespace WoodLib
 {
@@ -67,6 +68,44 @@ public:
     {
         return (const_cast<Array<T>&>(*this))[index];
     }
+
+    // 这里调用了会被 StaticArray 类和 DynamicArray 类继承过去
+    // 选择排序（O(n*n),不稳定 ） 默认从小到大排序
+    void selectSort(bool min2max = true)
+    {
+        Sort::selectSort(m_array, length(), min2max);
+    }
+
+    // 插入排序（O(n*n),稳定 ） 默认从小到大排序
+    void insertSort(bool min2max = true)
+    {
+        Sort::insertSort(m_array, length(), min2max);
+    }
+
+    // 冒泡排序（O(n*n),稳定 ） 默认从小到大排序
+    void bubbleSort(bool min2max = true)
+    {
+        Sort::bubbleSort(m_array, length(), min2max);
+    }
+
+    // 希尔排序（O(n的3/2次方), 不稳定 ） 默认从小到大排序
+    void shellSort(bool min2max = true)
+    {
+        Sort::shellSort(m_array, length(), min2max);
+    }
+
+    // 归并排序（O(nlogn), 稳定 ） 默认从小到大排序
+    void mergeSort(bool min2max = true)
+    {
+        Sort::mergeSort(m_array, length(), min2max);
+    }
+
+    // 快速排序（O(nlogn), 不稳定 ） 默认从小到大排序
+    void quickSort(bool min2max = true)
+    {
+        Sort::quickSort(m_array, length(), min2max);
+    }
+
 };
 
 }
