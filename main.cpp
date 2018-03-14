@@ -1,4 +1,4 @@
-// main.cpp  冒泡排序、希尔排序使用示例
+// main.cpp  归并排序、快速排序使用示例
 #include <iostream>
 #include "Sort.h"
 
@@ -7,10 +7,10 @@ using namespace WoodLib;
 
 int main()
 {
-    int array1[] = {8, 1, 0, 10, 99, 55, 12, 16};
+    int array1[] = {8, 8, 16, 10, 99, 8, 8, 8};
     int len1 = sizeof(array1) / sizeof(array1[0]);
 
-    Sort::bubbleSort(array1, len1);   // static成员函数直接通过类名调用
+    Sort::quickSort(array1, len1);   // static成员函数直接通过类名调用
 
     for(int i=0; i<len1; i++)
     {
@@ -19,10 +19,10 @@ int main()
 
     cout << endl;
 
-    int array2[] = {8, 1, 0, 10, 99, 55, 12, 16};
+    int array2[] = {8, 8, 16, 10, 99, 8, 8, 8};
     int len2 = sizeof(array2) / sizeof(array2[0]);
 
-    Sort::shellSort(array2, len2, false);
+    Sort::quickSort(array2, len2, false);
 
     for(int i=0; i<len2; i++)
     {
@@ -34,6 +34,6 @@ int main()
     return 0;
 }
 /* 运行结果
-0 1 8 10 12 16 55 99
-99 55 16 12 10 8 1 0
+8 8 8 8 8 10 16 99
+99 16 10 8 8 8 8 8
 */

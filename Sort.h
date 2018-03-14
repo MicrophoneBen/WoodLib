@@ -24,6 +24,121 @@ private:
         b = tmp;
     }
 
+    // 两路合并算法中的合并过程（归并算法）
+    // 将两个有序序列array[start...middle]和array[middle+1...end] 合并
+    template < typename T >
+    static void mergeSort(T array[], T helper[], int start, int middle, int end, bool min2max)
+    {
+        int left_index = start;
+        int right_index = middle + 1;
+        int helper_index = 0;
+
+        // 按顺序将两个有序序列中较 小/大 的依次放入helper中
+        while( (left_index <= middle) && (right_index <= end) )
+        {
+#if 0
+            if( min2max ? (array[left_index] < array[right_index]) : (array[left_index] > array[right_index]) )
+            {
+                // 取较 小/大 者放入helper中
+                helper[helper_index++] = array[left_index++];
+            }
+            else
+            {
+                helper[helper_index++] = array[right_index++];
+            }
+#else
+            // 上面if else 可以优化为下面这句；
+            helper[helper_index++] = ( min2max ? (array[left_index] < array[right_index]) : \
+                                                 (array[left_index] > array[right_index]) ) ? \
+                                                 (array[left_index++]) : (array[right_index++]);
+#endif
+        }
+
+        // 将左子序列中剩余部分直接拷贝到helper中
+        while( left_index <= middle )
+        {
+            helper[helper_index++] = array[left_index++];
+        }
+
+        // 将右子序列中剩余部分直接拷贝到helper中
+        while( right_index <= end )
+        {
+            helper[helper_index++] = array[right_index++];
+        }
+
+        // std::cout << "[" << start << "]" << std::endl;   // 用来追踪下面错误的
+
+        // 将数据拷贝回array中
+        for(int i=0; i<helper_index; i++)
+        {
+            // array[i] = helper[i];         // 错误，结果不是预期的
+            array[start + i] = helper[i];
+        }
+    }
+
+    // 两路合并算法中的分解算法
+    template <typename T>
+    static void mergeSort(T array[], T helper[], int start, int end, bool min2max)
+    {
+        if( start < end )
+        {
+            int middle = (start + end) /2;
+
+            // 递归结束条件，只要start < end说明还可以再分解
+            // 分解为两路
+            mergeSort(array, helper, start, middle, min2max);   // 函数返回后左子序列为有序序列
+            mergeSort(array, helper, middle + 1, end, min2max); // 函数返回后右子序列为有序序列
+
+            // 合并
+            mergeSort(array, helper, start, middle, end, min2max);
+        }
+    }
+
+    // 快速排序找到 基准 在序列中应该放入的位置，用返回值返回
+    template < typename T >
+    static int partition(T array[], int start, int end, bool min2max)
+    {
+        int ret = start;       // 用传进来的array[] 的最前面这个元素作为基准，下面就是找到这个基准应该处于序列中的位置
+
+        while( start < end )
+        {
+            // start 指针的移动,从左向右找出大于或者等于 基准 的元素
+            // 并且相等的元素只能在这个左边找出，不能在右边找
+            while( (start < end) && (min2max ? (array[start] < array[ret]) : (array[start] > array[ret])) )
+            {
+                start++;
+            }
+
+            // end 指针的移动,从右向左找出小于 基准 的元素
+            while( (start < end) && (min2max ? (array[end] >= array[ret]) : (array[end] <= array[ret])) )
+            {
+                end--;
+            }
+
+            // 交换上面两个跳出while循环时的 临界点，这样使得一边都是小于的基准的，另一边都是大于基准的
+            swap(array[start], array[end]);
+        }
+
+        // 将基准元素放入 low 和 high 相遇的地方
+        swap(array[ret], array[start]);
+
+        return (ret = start);  // 返回当前基准的位置
+    }
+
+    // 快速排序
+    template < typename T >
+    static void quickSort(T array[], int start, int end, bool min2max = true)
+    {
+        if( start < end )
+        {
+            // 递归结束条件
+            int pivot_index = partition(array, start, end, min2max);  //依基准分成两个区
+
+            quickSort(array, start, pivot_index - 1, min2max);        // 左区快排（递归）
+            quickSort(array, pivot_index +1, end, min2max);           // 右区快排（递归）
+        }
+    }
+
 public:
     // 选择排序（O(n*n),不稳定 ） 默认从小到大排序
     // array 要排序的数据 len 排序数据的长度 min2max 从小到大还是从大到小
@@ -140,11 +255,30 @@ public:
             }
 
         }while( d > 1 );
-
     }
 
-};
+    // 归并排序
+    template < typename T >
+    static void mergeSort(T array[], int len, bool min2max = true)
+    {
+        // 申请一片与待排数据大小一样的空间作为辅助空间使用
+        T* helper = new T[len];
 
+        if( helper != NULL )
+        {
+            mergeSort(array, helper, 0, len-1, min2max);
+        }
+
+        delete[] helper;
+    }
+
+    // 快速排序
+    template < typename T >
+    static void quickSort(T array[], int len, bool min2max = true)
+    {
+        quickSort(array, 0, len - 1, min2max);
+    }
+};
 
 }
 
