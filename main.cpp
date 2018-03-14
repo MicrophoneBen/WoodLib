@@ -1,4 +1,4 @@
-// main.cpp  选择排序和插入排序
+// main.cpp  冒泡排序、希尔排序使用示例
 #include <iostream>
 #include "Sort.h"
 
@@ -10,7 +10,7 @@ int main()
     int array1[] = {8, 1, 0, 10, 99, 55, 12, 16};
     int len1 = sizeof(array1) / sizeof(array1[0]);
 
-    Sort::selectSort(array1, len1);   // static成员函数直接通过类名调用
+    Sort::bubbleSort(array1, len1);   // static成员函数直接通过类名调用
 
     for(int i=0; i<len1; i++)
     {
@@ -22,7 +22,7 @@ int main()
     int array2[] = {8, 1, 0, 10, 99, 55, 12, 16};
     int len2 = sizeof(array2) / sizeof(array2[0]);
 
-    Sort::insertSort(array2, len2, false);
+    Sort::shellSort(array2, len2, false);
 
     for(int i=0; i<len2; i++)
     {

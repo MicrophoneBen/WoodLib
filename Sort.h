@@ -84,6 +84,65 @@ public:
         }
     }
 
+    // 冒泡排序 O(n*n)
+    template < typename T >
+    static void bubbleSort(T array[], int len, bool min2max = true)
+    {
+        // 如果无序区元素己排好序，则 exchange 为 false，
+        // 否则当发生元素交换时，说明仍是无序的
+        bool is_exchange = true;
+
+        // 1. 初始状态：有序区[]，无序区[0..n-1]
+        for(int i=0; (i<len) && (is_exchange); i++)
+        {
+            is_exchange = false;
+
+            // 2. 从无序的区最后面开始，让小的元素往前面冒
+            for(int j=len-1; j>i; j--)
+            {
+                if( min2max ? (array[j] < array[j - 1]) : (array[j] > array[j - 1]) )
+                {
+                    // 发生逆序，则交换
+                    swap(array[j], array[j - 1]);
+                    is_exchange = true;
+                }
+            }
+        }
+    }
+
+    // 希尔排序
+    template < typename T >
+    static void shellSort(T array[], int len, bool min2max = true)
+    {
+        int d = len;
+
+        do
+        {
+            d = d / 3 + 1;   // 增量序列，要保证每次 d 增量是递减的，且最终为 1
+			                 // 为什么是设计 3 次，有前辈的实践经验得到的数据； 
+
+            // 下面就是插入排序的逻辑了，注意 i、j 的增量！
+            for(int i=d; i<len; i+=d)
+            {
+                T element = array[i];
+                int insert_index = i;
+
+                for(int j=i-d; (j>=0) && (min2max ? (element < array[j]) : (element > array[j])); j-=d)
+                {
+                    array[j+d] = array[j];
+                    insert_index = j;
+                }
+
+                if( insert_index != i )
+                {
+                    array[insert_index] = element;
+                }
+            }
+
+        }while( d > 1 );
+
+    }
+
 };
 
 
