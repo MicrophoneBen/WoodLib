@@ -39,4 +39,6 @@ HEADERS += \
     QueenSolution.h \
     Sort.h \
     TreeNode.h \
-    Tree.h
+    Tree.h \
+    GTree.h \
+    GTreeNode.h

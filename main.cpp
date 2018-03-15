@@ -1,16 +1,15 @@
-// main.cpp  树的抽象类、树结点抽象类检测是否有错
+// main.cpp  通用树的类、通用树结点类检测类定义是否有错
 #include <iostream>
-#include "Tree.h"
-#include "TreeNode.h"
+#include "GTree.h"
+#include "GTreeNode.h"
 
 using namespace std;
 using namespace WoodLib;
 
 int main()
 {
-    //TreeNode<int> tn;   // 测试TreeNode 去掉显示纯虚析构函数 用的！！！
-    TreeNode<int>* tn;
-    Tree<int>* t;
+    GTreeNode<int> tn;
+    GTree<int> t;
 
     return 0;
 }
