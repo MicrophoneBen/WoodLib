@@ -1,4 +1,4 @@
-// main.cpp  通用树的类、通用树结点类检测类定义是否有错
+// main.cpp  通用树的 find() 函数检测
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
@@ -8,8 +8,12 @@ using namespace WoodLib;
 
 int main()
 {
-    GTreeNode<int> tn;
     GTree<int> t;
+
+    GTreeNode<int> tn;
+
+    t.find(0);     // 结果肯定是一片空白的
+    t.find(&tn);   // 因为还没有创建树
 
     return 0;
 }
