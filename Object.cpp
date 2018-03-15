@@ -44,6 +44,7 @@ bool Object::operator !=(const Object& obj)
 
 Object::~Object()
 {
+
 }
 
 }
