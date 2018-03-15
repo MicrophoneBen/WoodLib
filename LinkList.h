@@ -286,8 +286,15 @@ public:
     // 游标设置到index位置 以后游标每次移动step的长度，默认为游标步长为1
     virtual bool move(int index, int step = 1)
     {
-        bool ret = (0 <= index) && (index < m_length);
-        ret = ret && (0 < step) && (step < m_length);
+        // 不要对 index < m_length 或者 stdp < m_length 进行限制，因为在遍历链表时，首先第一步就是定位将游标定位到首结点
+        // 再判断这个结点是不是尾结点的，从而决定需不需要进行for循环；这个遍历过程使得当链表为空链表时（一个结点也没有，首结点也
+        // 没有，即头结点的 next指针 为NULL的情况时），此时m_length==0，若进行上面限制，将导致ret为false，这样就直接走异常
+        // 分支了，故不要有上面两个限制；
+        // 再另外一方面对于这种空链表的情况，不要上面限制，但实际上面限制其实遍历的过程也是已经避免了的，空链表时，这里
+        // ret == true；进入if分支 m_current 为 NULL，再在for的判断条件，!isEnd()时会过滤掉的，导致for循环不执行
+        // 所以综合上面两个方面的分析， index < m_length 或者 stdp < m_length 这个限制这里必须去掉！
+
+        bool ret = (0 <= index) && (0 < step);
 
         if( ret )
         {

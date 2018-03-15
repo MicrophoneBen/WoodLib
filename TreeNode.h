@@ -10,13 +10,13 @@ namespace WoodLib
 template < typename T >
 class TreeNode : public Object
 {
-public:                   // 结点中保存的值和指针域在外面需要随时可以访问到，所以这个一定要设置为公开的
-    T value;              // 树是用来存储数据的，所以肯定有个数据域
-    TreeNode<T>* parent;  // 指向父结点的指针域，树是非线性的数据结构，
-                          // 但这个指针的设计使得树的操作可以按线性操作
+public:                     // 结点中保存的值和指针域在外面需要随时可以访问到，所以这个一定要设置为公开的
+    T m_value;              // 树是用来存储数据的，所以肯定有个数据域
+    TreeNode<T>* m_parent;  // 指向父结点的指针域，树是非线性的数据结构，
+                            // 但这个指针的设计使得树的操作可以按线性操作
 
 public:
-    TreeNode() : parent(NULL)
+    TreeNode() : m_parent(NULL)
     {
 
     }

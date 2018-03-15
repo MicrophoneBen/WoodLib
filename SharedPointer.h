@@ -3,6 +3,7 @@
 
 #include "Pointer.h"
 #include "Exception.h"
+#include <cstdlib>
 
 namespace WoodLib
 {
@@ -31,7 +32,7 @@ public:
         if( p != NULL )
         {
             // 申请4个字节的空间存放这个计数指针
-            m_refCount = static_cast<int*>(std::malloc(sizeof(int)));
+            m_refCount = static_cast<int*>(malloc(sizeof(int)));
 
             if( m_refCount != NULL )
             {
@@ -66,7 +67,7 @@ public:
         return *this;
     }
 
-    clear()
+    void clear()
     {
         int* refCount = m_refCount;
         T* toDel = this->m_pointer;

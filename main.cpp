@@ -1,4 +1,4 @@
-// main.cpp  通用树的 find() 函数检测
+// main.cpp  通用树的 插入函数 insert()
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
@@ -8,13 +8,50 @@ using namespace WoodLib;
 
 int main()
 {
-    GTree<int> t;
+    GTree<char> t;
 
-    GTreeNode<int> tn;
+    t.insert('A', NULL);
+    t.insert('B', t.find('A'));
+    t.insert('C', t.find('A'));
+    t.insert('D', t.find('A'));
 
-    t.find(0);     // 结果肯定是一片空白的
-    t.find(&tn);   // 因为还没有创建树
+    t.insert('E', t.find('B'));
+    t.insert('F', t.find('B'));
+
+    t.insert('K', t.find('E'));
+    t.insert('L', t.find('E'));
+
+    t.insert('G', t.find('C'));
+
+    t.insert('H', t.find('D'));
+    t.insert('I', t.find('D'));
+    t.insert('J', t.find('D'));
+
+    t.insert('M', t.find('H'));
+
+    const char* s = "KLFGMIJ";
+
+    for(int i=0; i<7; i++)
+    {
+        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
+
+        while( NULL != node )
+        {
+            cout << node->m_value << " ";
+            node = node->m_parent;
+        }
+
+        cout << endl;
+    }
 
     return 0;
 }
-
+/* 运行结果
+K E B A
+L E B A
+F B A
+G C A
+M H D A
+I D A
+J D A
+*/
