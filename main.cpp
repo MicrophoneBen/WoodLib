@@ -1,4 +1,4 @@
-// main.cpp  通用树的 移除子树的操作 remove()
+// main.cpp  通用树的 属性操作 获取树的结点数、高度、度
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
@@ -36,8 +36,6 @@ int main()
 
     const char* s = "KLFGMIJ";
 
-    cout << "Before clear() ... " << endl;
-
     for(int i=0; i<7; i++)
     {
         TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
@@ -51,43 +49,13 @@ int main()
         cout << endl;
     }
 
-    cout << endl << "After remove() ... " << endl;
-
-    SharedPointer< Tree<char> > remove_tree = t.remove('D');
-
-    for(int i=0; i<7; i++)
-    {
-        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
-    }
-
-    cout << endl << "removed tree ... " << endl;
-
-    for(int i=0; i<7; i++)
-    {
-        // 使用智能智能
-        TreeNode<char>* node = (*remove_tree).find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
-    }
+    cout << "t.count() = " << t.count() << endl;
+    cout << "t.height() = " << t.height() << endl;
+    cout << "t.degree() = " << t.degree() << endl;
 
     return 0;
 }
 /* 运行结果
-Before clear() ...
 K E B A
 L E B A
 F B A
@@ -95,22 +63,7 @@ G C A
 M H D A
 I D A
 J D A
-
-After remove() ...
-K E B A
-L E B A
-F B A
-G C A
-
-
-
-
-removed tree ...
-
-
-
-
-M H D
-I D
-J D
+t.count() = 13
+t.height() = 4
+t.degree() = 3
 */

@@ -114,6 +114,74 @@ private:
         }
     }
 
+    int count(GTreeNode<T>* node) const
+    {
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            ret = 1;       // 能进入这里表示有根节点 ret = 1
+
+            for(node->m_child.move(0); !node->m_child.isEnd(); node->m_child.next())
+            {
+                // 能够进入 for循环 表示有孩子结点（for循环不能进入就是递归出口）
+                ret += count(node->m_child.current());
+            }
+        }
+
+        return ret;
+    }
+
+    int height(GTreeNode<T>* node) const
+    {
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            for(node->m_child.move(0); !node->m_child.isEnd(); node->m_child.next())
+            {
+                // 能够进入 for循环 表示有孩子结点（for循环不能进入就是递归出口）
+                int h = height(node->m_child.current());
+
+                // 特别强调：用数学思想理解
+                // 根结点几个 子树 高度比较取 最大的那个 就是子树中最大高度值了
+                if( ret < h )
+                {
+                    ret = h;
+                }
+            }
+
+            // 加上根结点的高度 1 就是整个树的高度了
+            ret = ret +1;
+        }
+
+        return ret;
+    }
+
+    int degree(GTreeNode<T>* node) const
+    {
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            // 能进入这里表示有根节点,再根据根结点中的 孩子链表中链表结点的个数 就是这个根节点的度
+            ret = node->m_child.length();
+
+            for(node->m_child.move(0); !node->m_child.isEnd(); node->m_child.next())
+            {
+                // 能够进入 for循环 表示有孩子结点（for循环不能进入就是递归出口）
+                int d = degree(node->m_child.current());
+
+                if( ret < d )
+                {
+                    ret = d;
+                }
+            }
+        }
+
+        return ret;
+    }
+
 
 public:
     bool insert(TreeNode<T>* node)
@@ -246,17 +314,17 @@ public:
 
     int degree() const
     {
-        return 0;
+        return degree(root());
     }
 
     int count() const
     {
-        return 0;
+        return count(root());
     }
 
     int height() const
     {
-        return 0;
+        return height(root());
     }
 
     // 清空树
