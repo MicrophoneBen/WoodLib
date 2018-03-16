@@ -14,6 +14,10 @@ class GTreeNode : public TreeNode<T>
 private:
     bool m_is_heap;
 
+    // 拷贝构造和赋值运算私有化 不让通用树结点间进行拷贝构造和赋值
+    GTreeNode(const GTreeNode<T>&);
+    GTreeNode<T>& operator =(const GTreeNode<T>&);
+
     // 重载 new 为私有的，外部不能直接 new 不要忘记加上throw() 失败不让抛出系统异常
     void* operator new(unsigned int size) throw()
     {

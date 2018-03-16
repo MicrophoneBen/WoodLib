@@ -5,6 +5,7 @@
 #include "Tree.h"
 #include "GTreeNode.h"
 #include "Exception.h"
+#include "LinkQueue.h"
 
 namespace WoodLib
 {
@@ -13,6 +14,12 @@ template < typename T >
 class GTree : public Tree<T>
 {
 private:
+    LinkQueue< GTreeNode<T>* > m_queue;  // 层次遍历队列用的队列
+
+    // 拷贝构造和赋值运算私有化 不让通用树进行拷贝构造和赋值
+    GTree(const GTree<T>&);
+    GTree<T>& operator =(const GTree<T>&);
+
     // 查找功能函数 以值作为查找 const 表示这个函数不修改变量值
     // 找到了就返回相应的节点地址 没找到就返回 NULL
     GTreeNode<T>* find(GTreeNode<T>* node, const T& value) const
@@ -184,6 +191,12 @@ private:
 
 
 public:
+    // 因为手动实现了拷贝构造所以就得手动提供出一个无参构造函数
+    GTree()
+    {
+
+    }
+
     bool insert(TreeNode<T>* node)
     {
         bool ret = true;
@@ -264,6 +277,8 @@ public:
         if( NULL != p_node )
         {
             remove(p_node, ret);
+
+            m_queue.clear();      // 移除子树后要清空一次层次遍历的队列
         }
         else
         {
@@ -284,6 +299,8 @@ public:
             // node是TreeNode<T>* 接受 find返回的 GTreeNode<T>*
             // 所以这里需要动态类型转换一下
             remove(dynamic_cast< GTreeNode<T>* >(node), ret);
+
+            m_queue.clear();      // 移除子树后要清空一次层次遍历的队列
         }
         else
         {
@@ -333,11 +350,66 @@ public:
         destory(root());      // 释放树中所有在堆上的结点
 
         this->m_root = NULL;  // 将根结点置为NULL
+
+        m_queue.clear();      // 清空树时要清空一次层次遍历的队列
     }
 
     ~GTree()
     {
         clear();
+    }
+
+    bool begin()
+    {
+        bool ret = (root() != NULL);  // 确保不是空树
+
+        if( ret )
+        {
+            m_queue.clear();          // 清空队列
+            m_queue.enQueue(root());  // 将根结点入队列
+        }
+
+        return ret;
+    }
+
+    bool isEnd()
+    {
+        return (m_queue.length() == 0);
+    }
+
+    // 返回当前光标指向的结点中的 valu
+    T current()
+    {
+        if( !isEnd() )
+        {
+            return m_queue.front()->m_value;  // 返回队首元素指向的值
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "No value at current position ...");
+        }
+    }
+
+    // 移动光标,实质是队首元素不断的在出队列,后面的元素就成为
+    // 队首元素 同时也将每一个出队列的队首元素的子结点全部插入队列
+    bool next()
+    {
+        bool ret = !!m_queue.length();               // 确保队列不为空
+
+        if( ret )
+        {
+            GTreeNode<T>* p_node = m_queue.front();  // 指向队首元素
+
+            for(p_node->m_child.move(0); !p_node->m_child.isEnd(); p_node->m_child.next())
+            {
+                // 出列的队首元素的子结点入列
+                m_queue.enQueue(p_node->m_child.current());
+            }
+
+            m_queue.deQueue();  // 队首元素出列
+        }
+
+        return ret;
     }
 
 };

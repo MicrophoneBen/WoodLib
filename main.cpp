@@ -1,8 +1,7 @@
-// main.cpp  通用树的 属性操作 获取树的结点数、高度、度
+// main.cpp  通用树的 层次遍历
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
-#include "SharedPointer.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -34,36 +33,16 @@ int main()
 
     t.insert('M', t.find('H'));
 
-    const char* s = "KLFGMIJ";
-
-    for(int i=0; i<7; i++)
+    // 按层次遍历整个树
+    for(t.begin(); !t.isEnd(); t.next())
     {
-        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
+        cout << t.current() << " ";
     }
 
-    cout << "t.count() = " << t.count() << endl;
-    cout << "t.height() = " << t.height() << endl;
-    cout << "t.degree() = " << t.degree() << endl;
+    cout << endl;
 
     return 0;
 }
 /* 运行结果
-K E B A
-L E B A
-F B A
-G C A
-M H D A
-I D A
-J D A
-t.count() = 13
-t.height() = 4
-t.degree() = 3
+A B C D E F G H I J K L M
 */
