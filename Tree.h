@@ -15,6 +15,10 @@ class Tree : public Object
 protected:
     TreeNode<T>* m_root;  // 指向树的根结点的指针
 
+    // 拷贝构造和赋值运算私有化 不让树进行拷贝构造和赋值
+    Tree(const Tree<T>&);
+    Tree<T>& operator =(const Tree<T>&);
+
 public:
     Tree() : m_root(NULL)
     {

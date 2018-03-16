@@ -41,4 +41,6 @@ HEADERS += \
     TreeNode.h \
     Tree.h \
     GTree.h \
-    GTreeNode.h
+    GTreeNode.h \
+    BTree.h \
+    BTreeNode.h

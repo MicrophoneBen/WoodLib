@@ -1,7 +1,9 @@
-// main.cpp  通用树的 层次遍历
+// main.cpp  代码重构、二叉树框架搭建测试
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
+#include "BTree.h"
+#include "BTreeNode.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -40,6 +42,9 @@ int main()
     }
 
     cout << endl;
+
+    BTree<char> bt;
+    BTreeNode<char> btn;       // 栈上创建根结点
 
     return 0;
 }

@@ -16,10 +16,6 @@ class GTree : public Tree<T>
 private:
     LinkQueue< GTreeNode<T>* > m_queue;  // 层次遍历队列用的队列
 
-    // 拷贝构造和赋值运算私有化 不让通用树进行拷贝构造和赋值
-    GTree(const GTree<T>&);
-    GTree<T>& operator =(const GTree<T>&);
-
     // 查找功能函数 以值作为查找 const 表示这个函数不修改变量值
     // 找到了就返回相应的节点地址 没找到就返回 NULL
     GTreeNode<T>* find(GTreeNode<T>* node, const T& value) const
@@ -191,12 +187,6 @@ private:
 
 
 public:
-    // 因为手动实现了拷贝构造所以就得手动提供出一个无参构造函数
-    GTree()
-    {
-
-    }
-
     bool insert(TreeNode<T>* node)
     {
         bool ret = true;
