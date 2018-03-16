@@ -62,6 +62,31 @@ private:
         return ret;
     }
 
+    // 功能函数 destory 用来释放堆上面的节点的
+    void destory(GTreeNode<T>* node)
+    {
+        if( NULL != node )
+        {
+            // 递归出口就是一棵树只有根结点时（即没有子结点 m_child 为空链表时），这个for循环
+            // 就不会进去，也就不会再递归了，也就会执行后面清除 根结点 node 了，这就是递归出口
+            for(node->m_child.move(0); !node->m_child.isEnd(); node->m_child.next())
+            {
+                // 递归思想
+                destory(node->m_child.current());
+            }
+
+            if( node->isHeap() )
+            {
+                delete node;       // 清除完子树后将根结点干掉
+            }
+            else
+            {
+                std::cout << node->m_value << std::endl;   // 测试看看的，非堆上的结点就打印出来
+            }
+        }
+    }
+
+
 public:
     bool insert(TreeNode<T>* node)
     {
@@ -107,7 +132,7 @@ public:
     {
         bool ret = true;
 
-        GTreeNode<T>* p_node = new GTreeNode<T>();
+        GTreeNode<T>* p_node = GTreeNode<T>::newNode();  // 只能调用static函数来在堆上创建了
 
         if( NULL != p_node )
         {
@@ -169,9 +194,12 @@ public:
         return 0;
     }
 
+    // 清空树
     void clear()
     {
-        this->m_root = NULL;
+        destory(root());      // 释放树中所有在堆上的结点
+
+        this->m_root = NULL;  // 将根结点置为NULL
     }
 
     ~GTree()
