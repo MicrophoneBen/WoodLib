@@ -122,7 +122,7 @@ public:
 
     virtual bool insert(const T& element)   // 尾部插入
     {
-        insert(m_length, element);
+        return insert(m_length, element);
     }
 
     bool remove(int index)

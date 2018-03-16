@@ -1,7 +1,8 @@
-// main.cpp  通用树的 清空树操作 clear()
+// main.cpp  通用树的 移除子树的操作 remove()
 #include <iostream>
 #include "GTree.h"
 #include "GTreeNode.h"
+#include "SharedPointer.h"
 
 using namespace std;
 using namespace WoodLib;
@@ -50,9 +51,9 @@ int main()
         cout << endl;
     }
 
-    cout << endl << "After clear() ... " << endl;
+    cout << endl << "After remove() ... " << endl;
 
-    t.clear();
+    SharedPointer< Tree<char> > remove_tree = t.remove('D');
 
     for(int i=0; i<7; i++)
     {
@@ -67,7 +68,21 @@ int main()
         cout << endl;
     }
 
-    // 只有 'A' 这个结点不是堆上面的,所以clear()不销毁，让main()结束时自己销毁
+    cout << endl << "removed tree ... " << endl;
+
+    for(int i=0; i<7; i++)
+    {
+        // 使用智能智能
+        TreeNode<char>* node = (*remove_tree).find(s[i]);  // 找到各个分支的叶结点
+
+        while( NULL != node )
+        {
+            cout << node->m_value << " ";
+            node = node->m_parent;
+        }
+
+        cout << endl;
+    }
 
     return 0;
 }
@@ -81,6 +96,21 @@ M H D A
 I D A
 J D A
 
-After clear() ...
-A
+After remove() ...
+K E B A
+L E B A
+F B A
+G C A
+
+
+
+
+removed tree ...
+
+
+
+
+M H D
+I D
+J D
 */

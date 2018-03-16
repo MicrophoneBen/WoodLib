@@ -79,10 +79,38 @@ private:
             {
                 delete node;       // 清除完子树后将根结点干掉
             }
+        }
+    }
+
+    // 功能函数 remove 用来删除树中的树枝
+    void remove(GTreeNode<T>* node, GTree<T>*& ret)
+    {
+        ret = new GTree<T>;
+
+        if( NULL != ret )
+        {
+            if( this->m_root == node )
+            {
+                this->m_root = NULL;
+            }
             else
             {
-                std::cout << node->m_value << std::endl;   // 测试看看的，非堆上的结点就打印出来
+                // 获得要移除结点的父结点的孩子链表，要移除的结点的地址就保存在 这个孩子链表里 某个结点的数据域上
+                LinkList< GTreeNode<T>* >& child = dynamic_cast< GTreeNode<T>* >(node->m_parent)->m_child;
+
+                // 找到 要移除结点 在链表中的索引号，再根据这个索引号将其从链表中移除（注意这个不是递归，是单链表的remove函数）
+                child.remove(child.find(node));
+
+                // 将移除结点的父结点指针置为NULL，使之成为根结点
+                node->m_parent = NULL;
             }
+
+            // 将移除的结点作为根结点的树 赋给返回值 ret
+            ret->m_root = node;
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat new tree ...");
         }
     }
 
@@ -152,12 +180,49 @@ public:
     // <> 间空格隔开，防止出现 >> 被编译器错误解读符合，导致编译错误
     SharedPointer< Tree<T> > remove(const T& value)
     {
-        return NULL;
+        //虽然函数原型返回值是 SharedPointer< Tree<T> >，但却不能这样定义ret
+        // 1、这样定义 那么这个只能指针对象还是个栈对象，返回栈空间引发程序崩溃
+        // 2、remove(p_node, ret) 时，作为传参的ret的类型时 GTree<T>*
+        //   下面SharedPointer< Tree<T> >的类型会编译直接报错
+        // 3、ret定义为GTree<T>*类型，是个指针它最后指向的是一片堆空间，再这个
+        //   函数结束时编译器会根据函数原型是智能指针，而用这个 ret 帮我创建出
+        //   个智能智能类对象来接受ret，然后再返回！
+        //SharedPointer< Tree<T> > ret = NULL;
+
+        GTree<T>* ret = NULL;
+
+        GTreeNode<T>* p_node = find(value);
+
+        if( NULL != p_node )
+        {
+            remove(p_node, ret);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Can not find the node via parameter value ...");
+        }
+
+        return ret;
     }
 
     SharedPointer< Tree<T> > remove(TreeNode<T>* node)
     {
-        return NULL;
+        GTree<T>* ret = NULL;
+
+        node = find(node);
+
+        if( NULL != node )
+        {
+            // node是TreeNode<T>* 接受 find返回的 GTreeNode<T>*
+            // 所以这里需要动态类型转换一下
+            remove(dynamic_cast< GTreeNode<T>* >(node), ret);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Can not find the node via parameter value ...");
+        }
+
+        return ret;
     }
 
     // 注意返回值由 父类结点指针TreeNode<T>*改为 当前类结点指针GTreeNode<T>*（赋值兼容原则）
