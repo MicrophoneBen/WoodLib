@@ -6,9 +6,17 @@
 #include "BTreeNode.h"
 #include "Exception.h"
 #include "LinkQueue.h"
+#include "DynamicArray.h"
 
 namespace WoodLib
 {
+
+enum BTreeTraversal
+{
+    PreOrder,    // 先序遍历
+    InOrder,     // 中序遍历
+    PostOrder    // 后序遍历
+};
 
 template < typename T >
 class BTree : public Tree<T>
@@ -240,6 +248,39 @@ private:
         return ret;
     }
 
+    // 先序遍历
+    void preOrderTraversal(BTreeNode<T>* node, LinkQueue< BTreeNode<T>* >& queue)
+    {
+        if( NULL != node )    // 叶结点（即node == NULL）就是递归出口
+        {
+            queue.enQueue(node);                       // 将根节点入列
+            preOrderTraversal(node->m_left, queue);    // 递归 左孩子入列
+            preOrderTraversal(node->m_right, queue);   // 递归 右孩子入列
+        }
+    }
+
+    // 中序遍历
+    void inOrderTraversal(BTreeNode<T>* node, LinkQueue< BTreeNode<T>* >& queue)
+    {
+        if( NULL != node )
+        {
+            inOrderTraversal(node->m_left, queue);
+            queue.enQueue(node);
+            inOrderTraversal(node->m_right, queue);
+        }
+    }
+
+    // 后序遍历
+    void postOrderTraversal(BTreeNode<T>* node, LinkQueue< BTreeNode<T>* >& queue)
+    {
+        if( NULL != node )
+        {
+            postOrderTraversal(node->m_left, queue);
+            postOrderTraversal(node->m_right, queue);
+            queue.enQueue(node);
+        }
+    }
+
 public:
     bool insert(TreeNode<T>* new_node)
     {
@@ -338,7 +379,7 @@ public:
 
         if( NULL != remove_node )
         {
-            remove(dynamic_cast< BTreeNode<T>* >(remove_node), ret);
+            remove(dynamic_cast< BTreeNode<T>* >(remove_node), ret);  // ret 在这个里面指向了一个堆空间
             m_queue.clear();
         }
         else
@@ -445,6 +486,51 @@ public:
             }
 
             m_queue.deQueue();  // 队首元素出列
+        }
+
+        return ret;
+    }
+
+    // 典型遍历方法  根据参数选择 先序/中序/后序
+    SharedPointer< Array<T> > traversal(BTreeTraversal order)
+    {
+        DynamicArray<T>* ret = NULL;
+        LinkQueue< BTreeNode<T>* > queue;
+
+        switch (order)
+        {
+        case PreOrder:
+            preOrderTraversal(root(), queue);
+            break;
+
+        case InOrder:
+            inOrderTraversal(root(), queue);
+            break;
+
+        case PostOrder:
+            postOrderTraversal(root(), queue);
+            break;
+
+        default:
+            THROW_EXCEPTION(InvalidParameterException, "Parameter order is invalid ...");
+            break;
+        }
+
+        ret = new DynamicArray<T>(queue.length());  // 这一步一定不能忘记了
+
+        if( ret )
+        {
+            for(int i=0; i<(ret->length()); i++)
+            {
+                //ret[i] = queue.front()->m_value;     // 这个导致异常错误, (*ret) 才是数组
+                //(*ret)[i] = queue.front()->m_value;  // 这个是正确的
+                ret->set(i, queue.front()->m_value);   // 上面的可以，这个也可以，任选其一
+                queue.deQueue();
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat return array ...");
         }
 
         return ret;
