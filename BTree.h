@@ -162,7 +162,24 @@ private:
         {
             THROW_EXCEPTION(NotEnoughMemoryException, "No enough memory to creat new tree ...");
         }
+    }
 
+    void destory(BTreeNode<T>* node)
+    {
+        if( NULL != node )
+        {
+            destory(node->m_left);   // 递归清除左孩子
+            destory(node->m_right);  // 递归清除右孩子
+
+            if( node->isHeap() )
+            {
+                delete node;
+            }
+            else
+            {
+                std::cout << node->m_value << std::endl;  // 测试用
+            }
+        }
     }
 
 public:
@@ -305,7 +322,9 @@ public:
 
     void clear()
     {
-        this->m_root = NULL;
+        destory(root());
+
+        this->m_root = NULL;   // 这步不要忽略了，否则出现不可预期的运行结果
     }
 
     ~BTree()

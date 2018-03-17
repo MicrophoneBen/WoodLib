@@ -1,4 +1,4 @@
-// main.cpp  二叉树 移除子树 remove() 使用示例
+// main.cpp  二叉树 清空树 clear() 使用示例
 #include <iostream>
 #include "BTree.h"
 #include "BTreeNode.h"
@@ -26,7 +26,7 @@ int main()
 
     const char* s = "DEFG";
 
-    cout << "Before remove ..." << endl;
+    cout << "Before clear() ..." << endl;
 
     for(int i=0; i<4; i++)
     {
@@ -41,10 +41,11 @@ int main()
         cout << endl;
     }
 
-    cout << endl << "After remove ..." << endl;
+    cout << endl << "Run clear() ..." << endl;
 
-    SharedPointer< Tree<char> > remove_tree = t.remove('C');             // 按值移除
-    //SharedPointer< Tree<char> > remove_tree = t.remove(t.find('C'));   // 按结点移除
+    t.clear();
+
+    cout << endl << "After clear() ..." << endl;
 
     for(int i=0; i<4; i++)
     {
@@ -59,40 +60,21 @@ int main()
         cout << endl;
     }
 
-    cout << endl << "Tree of removed ..." << endl;
-
-    for(int i=0; i<4; i++)
-    {
-        // remove_tree 是个智能指针对象, *remove_tree 类型是 Tree 类型
-        // 但还是正常使用到了 BTree 中的find，这个地方就用到了多态的技术
-        TreeNode<char>* node = remove_tree->find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
-    }
     return 0;
 }
 /* 运行结果
-Before remove ...
+Before clear() ...
 D B A
 E B A
 F C A
 G C A
 
-After remove ...
-D B A
-E B A
+Run clear() ...
+A
+
+After clear() ...
 
 
 
-Tree of removed ...
 
-
-F C
-G C
 */
