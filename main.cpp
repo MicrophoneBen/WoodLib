@@ -1,4 +1,4 @@
-// main.cpp  二叉树 清空树 clear() 使用示例
+// main.cpp  二叉树 属性操作 使用示例
 #include <iostream>
 #include "BTree.h"
 #include "BTreeNode.h"
@@ -24,28 +24,11 @@ int main()
     t.insert('F', t.find('C'));
     t.insert('G', t.find('C'));
 
-    const char* s = "DEFG";
+    t.insert('H', t.find('D'));
 
-    cout << "Before clear() ..." << endl;
+    t.insert('I', t.find('H'));
 
-    for(int i=0; i<4; i++)
-    {
-        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
-    }
-
-    cout << endl << "Run clear() ..." << endl;
-
-    t.clear();
-
-    cout << endl << "After clear() ..." << endl;
+    const char* s = "IEFG";
 
     for(int i=0; i<4; i++)
     {
@@ -59,22 +42,19 @@ int main()
 
         cout << endl;
     }
+
+    cout << "t.count() = " << t.count() << endl;
+    cout << "t.height() = " << t.height() << endl;
+    cout << "t.degree() = " << t.degree() << endl;
 
     return 0;
 }
 /* 运行结果
-Before clear() ...
-D B A
+I H D B A
 E B A
 F C A
 G C A
-
-Run clear() ...
-A
-
-After clear() ...
-
-
-
-
+t.count() = 9
+t.height() = 5
+t.degree() = 2
 */

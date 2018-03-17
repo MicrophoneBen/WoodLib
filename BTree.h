@@ -182,6 +182,61 @@ private:
         }
     }
 
+    int count(BTreeNode<T>* node) const
+    {
+#if 0
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            ret = count(node->m_left) + count(node->m_right) + 1;
+        }
+
+        return ret;
+#else
+        // 将上面代码优化为下面一句
+        return (NULL != node) ? (count(node->m_left) + count(node->m_right) + 1) : 0;
+
+#endif
+    }
+
+    int height(BTreeNode<T>* node) const
+    {
+#if 0
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            // 用数学思想理解这句
+            ret = (height(node->m_left) > height(node->m_right) ? height(node->m_left) : height(node->m_right)) + 1;
+        }
+
+        return ret;
+#else
+        // 将上面代码优化为这一句代码
+        return (NULL != node) ? ((height(node->m_left) > height(node->m_right) ? height(node->m_left) : height(node->m_right)) + 1): 0;
+#endif
+    }
+
+    int degree(BTreeNode<T>* node) const
+    {
+        int ret = 0;       // 不能进入 if 表示根结点为NULL则 ret = 0
+
+        if( NULL != node )
+        {
+            ret = !!(node->m_left) + !!(node->m_right);
+
+            // 二叉树度最大就为2，若已经为2了，就不用递归了
+            if( ret < 2 )
+            {
+                degree(node->m_left);
+                degree(node->m_right);
+            }
+        }
+
+        return ret;
+    }
+
 public:
     bool insert(TreeNode<T>* new_node)
     {
@@ -217,7 +272,6 @@ public:
         else
         {
             THROW_EXCEPTION(InvalidParameterException, "Parameter node cannot to be NULL ...");
-
         }
 
         return ret;
@@ -307,17 +361,17 @@ public:
 
     int degree() const
     {
-        return 0;
+        return degree(root());
     }
 
     int count() const
     {
-        return 0;
+        return count(root());
     }
 
     int height() const
     {
-        return 0;
+        return height(root());
     }
 
     void clear()

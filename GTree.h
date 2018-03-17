@@ -185,7 +185,6 @@ private:
         return ret;
     }
 
-
 public:
     bool insert(TreeNode<T>* node)
     {
