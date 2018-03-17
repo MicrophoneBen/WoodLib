@@ -7,14 +7,22 @@
 namespace WoodLib
 {
 
+// 二叉树结点在一个结点中的位置
+enum BTreeNodePos
+{
+    ANY,     // 左右都行
+    LEFT,    // 左指针指向的位置
+    RIGHT    // 右指针指向的位置
+};
+
 template < typename T >
 class BTreeNode : public TreeNode<T>
 {
 public:
-    BTreeNode<T>* left;
-    BTreeNode<T>* right;
+    BTreeNode<T>* m_left;
+    BTreeNode<T>* m_right;
 
-    BTreeNode() : left(NULL), right(NULL)
+    BTreeNode() : m_left(NULL), m_right(NULL)
     {
 
     }
@@ -28,10 +36,6 @@ public:
         {
             // 堆上面创建的结点 将 m_is_heap 标记为 true
             ret->m_is_heap = true;   // 不要忘记是 ret->m_is_heap
-        }
-        else
-        {
-            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to creat node ...");
         }
 
         return ret;

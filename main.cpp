@@ -1,7 +1,5 @@
-// main.cpp  代码重构、二叉树框架搭建测试
+// main.cpp  二叉树 查找、插入 使用示例
 #include <iostream>
-#include "GTree.h"
-#include "GTreeNode.h"
 #include "BTree.h"
 #include "BTreeNode.h"
 
@@ -10,8 +8,8 @@ using namespace WoodLib;
 
 int main()
 {
-    GTree<char> t;
-    GTreeNode<char> root;       // 栈上创建根结点
+    BTree<char> t;
+    BTreeNode<char> root;       // 栈上创建根结点
 
     root.m_value = 'A';
     root.m_parent = NULL;
@@ -19,35 +17,33 @@ int main()
     t.insert(&root);             // 根结点
     t.insert('B', t.find('A'));
     t.insert('C', t.find('A'));
-    t.insert('D', t.find('A'));
 
+    t.insert('D', t.find('B'));
     t.insert('E', t.find('B'));
-    t.insert('F', t.find('B'));
 
-    t.insert('K', t.find('E'));
-    t.insert('L', t.find('E'));
-
+    t.insert('F', t.find('C'));
     t.insert('G', t.find('C'));
 
-    t.insert('H', t.find('D'));
-    t.insert('I', t.find('D'));
-    t.insert('J', t.find('D'));
+    const char* s = "DEFG";
 
-    t.insert('M', t.find('H'));
-
-    // 按层次遍历整个树
-    for(t.begin(); !t.isEnd(); t.next())
+    for(int i=0; i<4; i++)
     {
-        cout << t.current() << " ";
+        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
+
+        while( NULL != node )
+        {
+            cout << node->m_value << " ";
+            node = node->m_parent;
+        }
+
+        cout << endl;
     }
-
-    cout << endl;
-
-    BTree<char> bt;
-    BTreeNode<char> btn;       // 栈上创建根结点
 
     return 0;
 }
 /* 运行结果
-A B C D E F G H I J K L M
+D B A
+E B A
+F C A
+G C A
 */

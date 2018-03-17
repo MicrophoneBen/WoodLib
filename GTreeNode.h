@@ -24,10 +24,7 @@ public:                                  // 通用树结点在外面需要随时
             // 堆上面创建的结点 将 m_is_heap 标记为 true
             ret->m_is_heap = true;   // 不要忘记是 ret->m_is_heap
         }
-        else
-        {
-            THROW_EXCEPTION(NotEnoughMemoryException, "Not enough memory to creat node ...");
-        }
+        // 外部肯定是会进行申请成功的判断的
 
         return ret;
     }

@@ -239,6 +239,11 @@ public:
             p_node->m_parent = parent;
 
             ret = insert(p_node);
+
+            if( !ret )
+            {
+                delete p_node;
+            }
         }
         else
         {
