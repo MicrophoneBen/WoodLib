@@ -281,6 +281,110 @@ private:
         }
     }
 
+    // 递归实现：将root为根结点的树 的每个结点的值 克隆到堆内存中的另一个树 对应的结点中
+    // 最后返回克隆后的树的 根结点
+    BTreeNode<T>* clone(BTreeNode<T>* root) const
+    {
+        BTreeNode<T>* ret = NULL;
+
+        if( NULL != root )    // 叶结点即root == NULL时是递归出口
+        {
+            ret = BTreeNode<T>::newNode();
+
+            if( NULL != ret )
+            {
+                ret->m_value = root->m_value;          // 克隆根结点的数据域
+
+                ret->m_left = clone(root->m_left);     // 克隆根结点左孩子的数据域 （递归到每一个左孩子）
+                ret->m_right = clone(root->m_right);   // 克隆根结点右孩子的数据域 （递归到每一个右孩子）
+
+                if( NULL != ret->m_left )
+                {
+                    ret->m_left->m_parent = ret;
+                }
+
+                if( NULL != ret->m_right )
+                {
+                    ret->m_right->m_parent = ret;
+                }
+            }
+            else
+            {
+                THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat clone tree ...");
+            }
+        }
+
+        return ret;      // 最后返回克隆之后树的 根结点地址
+    }
+
+    bool equal(BTreeNode<T>* root, BTreeNode<T>* other_root) const
+    {
+        bool ret = true;
+
+        if( root == other_root )                 // 同一个树时
+        {
+            ret = true;
+        }
+        else if( (!!root + !!other_root) == 1 )  // 一棵树为空树另外一棵不为空树
+        {
+            ret = false;
+        }
+        else                                     // 两棵树都不为空树
+        {
+            // 递归比较结点中的值
+            ret = root->m_value == other_root->m_value         \
+                && equal(root->m_left, other_root->m_left)     \
+                && equal(root->m_right, other_root->m_right);
+        }
+
+        return ret;
+    }
+
+    // 传参： 相加的两棵树的 根结点
+    // 返回值：相加后的树的 根结点地址
+    BTreeNode<T>* add(BTreeNode<T>* root, BTreeNode<T>* other_root) const
+    {
+        BTreeNode<T>* ret = NULL;
+
+        if( (!!root + !!other_root) < 1 )        // 两棵树都为空树
+        {
+            ret = NULL;
+        }
+        else if( (!!root + !!other_root) == 1 )  // 一棵树为空树另外一棵不为空树
+        {
+            ret = !!root ? clone(root) : clone(other_root);
+        }
+        else                                     // 两棵树都不为空树
+        {
+            ret = BTreeNode<T>::newNode();
+
+            if( ret )
+            {
+                ret->m_value = root->m_value + other_root->m_value;
+                ret->m_left = add(root->m_left, other_root->m_left);
+                ret->m_right = add(root->m_right, other_root->m_right);
+
+                // 设置相加后左右孩子结点的父结点，根结点不用设置直接为NULL
+                if( NULL != ret->m_left )
+                {
+                    ret->m_left->m_parent = ret;
+                }
+
+                if( NULL != ret->m_right )
+                {
+                    ret->m_right->m_parent = ret;
+                }
+            }
+            else
+            {
+                THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat new node ...");
+            }
+
+        }
+
+        return ret;
+    }
+
 public:
     bool insert(TreeNode<T>* new_node)
     {
@@ -531,6 +635,48 @@ public:
         else
         {
             THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat return array ...");
+        }
+
+        return ret;
+    }
+
+    SharedPointer< BTree<T> > clone() const
+    {
+        BTree<T>* ret = new BTree();
+
+        if( ret )
+        {
+            ret->m_root = clone(root());
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No memory to creat tree ...");
+        }
+
+        return ret;
+    }
+
+    bool operator ==(const BTree<T>& btree)
+    {
+        return equal(root(), btree.root());
+    }
+
+    bool operator !=(const BTree<T>& btree)
+    {
+        return !(*this == btree);
+    }
+
+    SharedPointer< BTree<T> > add(const BTree<T>& btree) const
+    {
+        BTree<T>* ret = new BTree();
+
+        if( NULL != ret )
+        {
+            ret->m_root = add(root(), btree.root());
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No memory to cerat the new tree ...");
         }
 
         return ret;
