@@ -121,6 +121,50 @@ private:
         return ret;
     }
 
+    // 注意理解：remove_node 是要移除的结点地址，并且已经确定这个树中一定有这个结点存在
+    void remove(BTreeNode<T>* remove_node, BTree<T>*& ret)
+    {
+        ret = new BTree();
+
+        if( NULL != ret )
+        {
+            // 判断这个要移除的结点是不是根结点
+            if( root() == remove_node )
+            {
+                this->m_root = NULL;
+            }
+            else
+            {
+#if 0
+                // 判断这个要移除的结点是左孩子还是右孩子
+                BTreeNode<T>* parent = dynamic_cast< BTreeNode<T>* >(remove_node->m_parent);
+
+                if( parent->m_left == remove_node )
+                {
+                    parent->m_left = NULL;
+                }
+                else if( parent->m_right == remove_node )
+                {
+                    parent->m_right = NULL;
+                }
+#else
+                // 上面if else 可以用下面一句代替
+                dynamic_cast< BTreeNode<T>* >(remove_node->m_parent)->m_left == remove_node ?   \
+                            dynamic_cast< BTreeNode<T>* >(remove_node->m_parent)->m_left = NULL \
+                          : dynamic_cast< BTreeNode<T>* >(remove_node->m_parent)->m_right = NULL;
+#endif
+            }
+
+            remove_node->m_parent = NULL;  // 将要移除的结点变为根结点
+            ret->m_root = remove_node;     // 将移除的结点代表的子树返回
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No enough memory to creat new tree ...");
+        }
+
+    }
+
 public:
     bool insert(TreeNode<T>* new_node)
     {
@@ -195,12 +239,38 @@ public:
 
     SharedPointer< Tree<T> > remove(const T& value)
     {
-        return NULL;
+        BTree<T>* ret = NULL;
+
+        BTreeNode<T>* remove_node = find(value);
+
+        if( NULL != remove_node )
+        {
+            remove(remove_node, ret);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Can not find the node via parameter value ...");
+        }
+
+        return ret;
     }
 
-    SharedPointer< Tree<T> > remove(TreeNode<T>* node)
+    SharedPointer< Tree<T> > remove(TreeNode<T>* remove_node)
     {
-        return NULL;
+        BTree<T>* ret = NULL;
+
+        remove_node = find(remove_node);
+
+        if( NULL != remove_node )
+        {
+            remove(dynamic_cast< BTreeNode<T>* >(remove_node), ret);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Can not find the node via parameter remove_node ...");
+        }
+
+        return ret;
     }
 
     BTreeNode<T>* find(const T& value) const
