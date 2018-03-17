@@ -1,4 +1,4 @@
-// main.cpp  二叉树 属性操作 使用示例
+// main.cpp  二叉树 层次遍历 使用示例
 #include <iostream>
 #include "BTree.h"
 #include "BTreeNode.h"
@@ -28,33 +28,15 @@ int main()
 
     t.insert('I', t.find('H'));
 
-    const char* s = "IEFG";
-
-    for(int i=0; i<4; i++)
+    for(t.begin(); !t.isEnd(); t.next())
     {
-        TreeNode<char>* node = t.find(s[i]);  // 找到各个分支的叶结点
-
-        while( NULL != node )
-        {
-            cout << node->m_value << " ";
-            node = node->m_parent;
-        }
-
-        cout << endl;
+        cout << t.current() << " ";
     }
 
-    cout << "t.count() = " << t.count() << endl;
-    cout << "t.height() = " << t.height() << endl;
-    cout << "t.degree() = " << t.degree() << endl;
+    cout << endl;
 
     return 0;
 }
 /* 运行结果
-I H D B A
-E B A
-F C A
-G C A
-t.count() = 9
-t.height() = 5
-t.degree() = 2
+A B C D E F G H I
 */

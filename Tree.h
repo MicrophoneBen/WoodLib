@@ -44,6 +44,11 @@ public:
     virtual int count() const = 0;           // 树的结点数目
     virtual int height() const = 0;          // 树的高度
     virtual void clear() = 0;                // 清空树
+
+    virtual bool begin() = 0;                // 用来层次遍历的,根节点入列，根节点成为队头元素
+    virtual bool isEnd() = 0;                // 用来层次遍历的,判断当前队列是否为空
+    virtual bool next() = 0;                 // 用来层次遍历的,队头元素出列，下一元素成为新的队头元素
+    virtual T current() = 0;                 // 用来层次遍历的,获取队列中当前队头元素的值
 };
 
 }

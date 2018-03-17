@@ -5,6 +5,7 @@
 #include "Tree.h"
 #include "BTreeNode.h"
 #include "Exception.h"
+#include "LinkQueue.h"
 
 namespace WoodLib
 {
@@ -13,6 +14,8 @@ template < typename T >
 class BTree : public Tree<T>
 {
 private:
+    LinkQueue< BTreeNode<T>* > m_queue;  // 层次遍历队列用的队列
+
     // 找到了就返回相应的节点地址 没找到就返回 NULL
     BTreeNode<T>* find(BTreeNode<T>* root, const T& value) const
     {
@@ -317,6 +320,7 @@ public:
         if( NULL != remove_node )
         {
             remove(remove_node, ret);
+            m_queue.clear();
         }
         else
         {
@@ -335,6 +339,7 @@ public:
         if( NULL != remove_node )
         {
             remove(dynamic_cast< BTreeNode<T>* >(remove_node), ret);
+            m_queue.clear();
         }
         else
         {
@@ -379,12 +384,72 @@ public:
         destory(root());
 
         this->m_root = NULL;   // 这步不要忽略了，否则出现不可预期的运行结果
+
+        m_queue.clear();
     }
 
     ~BTree()
     {
         clear();
     }
+
+    bool begin()
+    {
+        bool ret = (root() != NULL);  // 确保不是空树
+
+        if( ret )
+        {
+            m_queue.clear();          // 清空队列
+            m_queue.enQueue(root());  // 将根结点入队列
+        }
+
+        return ret;
+    }
+
+    bool isEnd()
+    {
+        return (m_queue.length() == 0);
+    }
+
+    // 返回当前光标指向的结点中的 m_value
+    T current()
+    {
+        if( !isEnd() )
+        {
+            return m_queue.front()->m_value;  // 返回队首元素指向的值
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "No value at current position ...");
+        }
+    }
+
+    // 移动光标,实质是队首元素不断的在出队列,后面的元素就成为
+    // 队首元素 同时也将每一个出队列的队首元素的子结点全部插入队列
+    bool next()
+    {
+        bool ret = !!m_queue.length();               // 确保队列不为空
+
+        if( ret )
+        {
+            BTreeNode<T>* p_node = m_queue.front();  // 指向队首元素
+
+            if( p_node->m_left != NULL )
+            {
+                m_queue.enQueue(p_node->m_left);
+            }
+
+            if( p_node->m_right != NULL )
+            {
+                m_queue.enQueue(p_node->m_right);
+            }
+
+            m_queue.deQueue();  // 队首元素出列
+        }
+
+        return ret;
+    }
+
 };
 
 }

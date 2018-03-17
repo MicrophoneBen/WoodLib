@@ -371,7 +371,7 @@ public:
         return (m_queue.length() == 0);
     }
 
-    // 返回当前光标指向的结点中的 valu
+    // 返回当前光标指向的结点中的 m_value
     T current()
     {
         if( !isEnd() )
@@ -405,7 +405,6 @@ public:
 
         return ret;
     }
-
 };
 
 }
