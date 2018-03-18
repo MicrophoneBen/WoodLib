@@ -1,4 +1,4 @@
-// main.cpp  二叉树 典型遍历方式 使用示例
+// main.cpp  二叉树 线索化（将二叉树变为双向链表） 使用示例
 #include <iostream>
 #include "BTree.h"
 #include "BTreeNode.h"
@@ -35,71 +35,38 @@ int main()
         cout << t.current() << " ";
     }
 
-    cout << endl << endl << "Clone BTree ... " << endl;
+    // 新增的层次遍历函数功能
+    cout << endl << endl << "LevelOrder BTree ... " << endl;
 
-    // clone() 操作检测
-    SharedPointer< BTree<int> > tree = t.clone();
+    SharedPointer< Array<int> > tree = t.traversal(LevelOrder);
 
-    for(tree->begin(); !tree->isEnd(); tree->next())
+    for(int i=0; i<tree->length(); i++)
     {
-        cout << tree->current() << " ";
+        cout << (*tree)[i] << " ";
     }
 
-    // 比较操作检测
-    cout << endl << endl << "t == *tree : " << (t == *tree) << endl;
-    cout << "t != *tree : " << (t != *tree) << endl;
+    // 测试二叉树线索化后的双向链表
+    cout << endl << endl << "LevelOrderthreading Link ... " << endl;
 
-    t.insert(100, t.find(9));
+    BTreeNode<int>* node = t.threading(LevelOrder);
+    BTreeNode<int>* end = NULL;
 
-    cout << endl << "Old BTree insert '100' ... " << endl;
-
-    for(t.begin(); !t.isEnd(); t.next())
+    while( !!node )
     {
-        cout << t.current() << " ";
+        cout << node->m_value << "->";
+        end = node;
+        node = node->m_right;          // m_right 指针逐个访问
     }
 
-    cout << endl << endl << "t == *tree : " << (t == *tree) << endl;
-    cout << "t != *tree : " << (t != *tree) << endl << endl;
+    cout << "NULL" << endl;
 
-    // add() 检测
-    cout << "Old + Clone BTree ..." << endl;
-    SharedPointer< BTree<int> > sum = t.add(*tree);
-
-    for(sum->begin(); !sum->isEnd(); sum->next())
+    while( !!end )
     {
-        cout << sum->current() << " ";
+        cout << end->m_value << "->";
+        end = end->m_left;             // m_left 指针逐个访问
     }
 
-    cout << endl << endl;
-
-    // 对相加后的树父结点指针检测
-    const int value[] = {100, 10, 12, 14};
-
-    for(int i=0; i < sizeof(value) / sizeof(value[0]); i++)
-    {
-        TreeNode<int>* node = sum->find(value[i]);
-
-        while( node != NULL )
-        {
-            cout << node->m_value << "->";
-            node = node->m_parent;
-        }
-
-        cout << "NULL" << endl;
-    }
-
-    cout << endl;
-
-    // 非空树与一棵空树相加
-    cout << "Clone + Empty BTree ..." << endl;
-    SharedPointer< BTree<int> > sum1 = (*sum).add(BTree<int>());
-
-    for(sum1->begin(); !sum1->isEnd(); sum1->next())
-    {
-        cout << sum1->current() << " ";
-    }
-
-    cout << endl;
+    cout << "NULL" << endl;
 
     return 0;
 }
@@ -107,26 +74,10 @@ int main()
 Old BTree ...
 1 2 3 4 5 6 7 8 9
 
-Clone BTree ...
+LevelOrder BTree ...
 1 2 3 4 5 6 7 8 9
 
-t == *tree : 1
-t != *tree : 0
-
-Old BTree insert '100' ...
-1 2 3 4 5 6 7 8 9 100
-
-t == *tree : 0
-t != *tree : 1
-
-Old + Clone BTree ...
-2 4 6 8 10 12 14 16 18 100
-
-100->18->16->8->4->2->NULL
-10->4->2->NULL
-12->6->2->NULL
-14->6->2->NULL
-
-Clone + Empty BTree ...
-2 4 6 8 10 12 14 16 18 100
+LevelOrderthreading Link ...
+1->2->3->4->5->6->7->8->9->NULL
+9->8->7->6->5->4->3->2->1->NULL
 */

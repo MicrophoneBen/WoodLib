@@ -15,7 +15,8 @@ enum BTreeTraversal
 {
     PreOrder,    // 先序遍历
     InOrder,     // 中序遍历
-    PostOrder    // 后序遍历
+    PostOrder,   // 后序遍历
+    LevelOrder   // 层次遍历
 };
 
 template < typename T >
@@ -279,6 +280,93 @@ private:
             postOrderTraversal(node->m_right, queue);
             queue.enQueue(node);
         }
+    }
+
+    // 层次遍历
+    void levelOrderTraversal(BTreeNode<T>* node, LinkQueue< BTreeNode<T>* >& queue)
+    {
+        if( NULL != node )
+        {
+            LinkQueue< BTreeNode<T>* > tmp;
+
+            tmp.enQueue(node);
+
+            while( !!tmp.length() )
+            {
+                if( !!(tmp.front()->m_left) )
+                {
+                    tmp.enQueue(tmp.front()->m_left);
+                }
+
+                if( !!(tmp.front()->m_right) )
+                {
+                    tmp.enQueue(tmp.front()->m_right);
+                }
+
+                queue.enQueue(tmp.front());
+
+                tmp.deQueue();
+            }
+        }
+    }
+
+    // 典型遍历方法  根据参数选择 先序/中序/后序,再按遍历次序将结点放入参数 队列queue 中
+    void traversal(BTreeTraversal order, LinkQueue< BTreeNode<T>* >& queue)
+    {
+        switch (order)
+        {
+        case PreOrder:
+            preOrderTraversal(root(), queue);
+            break;
+
+        case InOrder:
+            inOrderTraversal(root(), queue);
+            break;
+
+        case PostOrder:
+            postOrderTraversal(root(), queue);
+            break;
+
+        case LevelOrder:
+            levelOrderTraversal(root(), queue);
+            break;
+
+        default:
+            THROW_EXCEPTION(InvalidParameterException, "Parameter order is invalid ...");
+            break;
+        }
+    }
+
+    // 将队列中的各个元素连接起来形成一个双向链表(注意不是双向循环链表)
+    BTreeNode<T>* connect(LinkQueue< BTreeNode<T>* >& queue)
+    {
+        BTreeNode<T>* ret = NULL;
+
+        if( !!queue.length() )
+        {
+            ret = queue.front();                  // 后面组成双向链表的首结点地址
+
+            BTreeNode<T>* slider = queue.front(); // slider 指针指向队头首元素
+
+            queue.deQueue();                      // 队头元素出列
+
+            slider->m_left = NULL;                // 第一个出列的 m_left 指针指向 NULL
+
+            // 将队列中后面的元素每个互相连接起来
+            while( !!queue.length() )
+            {
+                slider->m_right = queue.front();  // 出列的元素的 m_right 指向现在的队头元素
+                queue.front()->m_left = slider;   // 现在的队头元素的 m_left 指向指向出列的元素,就构成双向链表了
+
+                slider = queue.front();           // slider 指向当前的队头元素
+                queue.deQueue();                  // 当前的队头元素出列
+            }
+
+            // 队列最后一个元素的 right 指向 NULL,所以不是循环链表
+            slider->m_right = NULL;
+        }
+
+        return ret;
     }
 
     // 递归实现：将root为根结点的树 的每个结点的值 克隆到堆内存中的另一个树 对应的结点中
@@ -601,24 +689,7 @@ public:
         DynamicArray<T>* ret = NULL;
         LinkQueue< BTreeNode<T>* > queue;
 
-        switch (order)
-        {
-        case PreOrder:
-            preOrderTraversal(root(), queue);
-            break;
-
-        case InOrder:
-            inOrderTraversal(root(), queue);
-            break;
-
-        case PostOrder:
-            postOrderTraversal(root(), queue);
-            break;
-
-        default:
-            THROW_EXCEPTION(InvalidParameterException, "Parameter order is invalid ...");
-            break;
-        }
+        traversal(order, queue);
 
         ret = new DynamicArray<T>(queue.length());  // 这一步一定不能忘记了
 
@@ -682,6 +753,29 @@ public:
         return ret;
     }
 
+    // 根据参数 order 选择线索化的次序(先序、中序、后序、层次)
+    // 返回值：线索化之后指向链表首结点的指针
+    // 线索化执行结束之后对应的二叉树变为空树(因为 m_left 和 m_right 指针改变了)
+    BTreeNode<T>* threading(BTreeTraversal order)
+    {
+        BTreeNode<T>* ret = NULL;
+
+        LinkQueue< BTreeNode<T>* > queue;
+
+        traversal(order, queue);  // 按遍历方式将二叉树结点放入队列 queue 中
+
+        ret = connect(queue);     // 将队列中的各个元素做成双向链表
+
+        // 因为 connect()中将二叉树的 m_left 和 m_right 指针都破坏了
+        // 所以二叉树已经不存在了,因此将二叉树变为空树
+        this->m_root = NULL;
+
+        // 二叉树都为空树了,begin() end() next() current()
+        // 自然不能用了,所以与之相关的队列 m_queue 当然得清空
+        m_queue.clear();
+
+        return ret;
+    }
 };
 
 }
