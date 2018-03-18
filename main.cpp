@@ -1,4 +1,4 @@
-// main.cpp  二叉树 删除树中单度结点 使用示例
+// main.cpp  二叉树 （不使用其他数据结构）中序遍历线索化 使用示例
 #include <iostream>
 #include "BTree.h"
 #include "BTreeNode.h"
@@ -148,35 +148,161 @@ void delNodeDegree1_2(BTreeNode<T>*& root)
     }
 }
 
+// 输出双向链表(不是循环的双向链表)
+template < typename T >
+void printDualList(BTreeNode<T>* node)
+{
+    BTreeNode<T>* g = node;
+
+    cout << "head -> tail: " << endl;
+
+    while( node != NULL )
+    {
+        cout << node->m_value << " ";
+
+        g = node;
+
+        node = node->m_right;
+    }
+
+    cout << endl;
+
+    cout << "tail -> head: " << endl;
+
+    while( g != NULL )
+    {
+        cout << g->m_value << " ";
+
+        g = g->m_left;
+    }
+
+    cout << endl;
+}
+
+// 方法1 :不使用其他数据结构中序遍历线索化二叉树
+//        思想：边中序遍历边线索化
+// node : 根结点,也是中序访问的结点
+// pre  : 为中序遍历时的前驱结点指针
+template < typename T >
+void inOrderThread(BTreeNode<T>* node, BTreeNode<T>*& pre)
+{
+    if( node != NULL )    // 不为空树
+    {
+        // 递归处理左子树
+        // 这一步之后左子树就全部线索化了，并且pre指向左子树线索化后的最后一个结点
+        inOrderThread(node->m_left, pre);
+
+        // 将右子树中序遍历的第一个结点的m_left指针指向上面左子树线索化后的最后一个指针
+        // 如此左右子树便连接起来了
+        node->m_left = pre;
+
+        if( pre != NULL )
+        {
+            pre->m_right = node;
+        }
+
+        pre = node;
+
+        inOrderThread(node->m_right, pre); // 递归处理右子树
+    }
+}
+
+// 方法1
+template < typename T >
+BTreeNode<T>* inOrderThread1(BTreeNode<T>* node)
+{
+    BTreeNode<T>* pre = NULL;
+
+    inOrderThread(node, pre);
+
+    // 上面线索化后 node 可能已经不是首结点了，利用下面操作定位到 首结点位置
+    while( (node != NULL) && (node->m_left != NULL) )
+    {
+        node = node->m_left;
+    }
+
+    return node;
+}
+
+// 方法2 : 不使用中序遍历直接线索化二叉树
+// node : 根结点,也是中序访问的结点
+// head : 转换成功后指向双向链表的首结点
+// tail : 转换成功后指向双向链表的尾结点
+template < typename T >
+void inOrderThread(BTreeNode<T>* node, BTreeNode<T>*& head, BTreeNode<T>*& tail)
+{
+    if( node != NULL )
+    {
+        BTreeNode<T>* h = NULL;
+        BTreeNode<T>* t = NULL;
+
+        inOrderThread(node->m_left, h, t);  // 线索化左子树
+
+        node->m_left = t;
+
+        if( t != NULL )
+        {
+            t->m_right = node;
+        }
+
+        head = (h != NULL) ? h : node;       // 双向链表首结点
+
+        h = NULL;   // 这步不要忘记
+        t = NULL;
+
+        inOrderThread(node->m_right, h, t);  // 线索化右子树
+
+        node->m_right = h;
+
+        if( h != NULL )
+        {
+            h->m_left = node;
+        }
+
+        tail = (t != NULL) ? t : node;       // 双向链表尾结点
+    }
+}
+
+// 方法2
+template < typename T >
+BTreeNode<T>* inOrderThread2(BTreeNode<T>* node)
+{
+    BTreeNode<T>* head = NULL;
+    BTreeNode<T>* tail = NULL;
+
+    inOrderThread(node, head, tail);
+
+    return head;
+}
+
 int main()
 {
-    BTreeNode<int>* bt = createTree<int>();
+    BTreeNode<int>* tn = createTree<int>();
+    printInOrder(tn);
 
-    printInOrder(bt);
+    cout << endl;
+
+    tn = inOrderThread1(tn);
+    printDualList(tn);
 
     cout << endl;
 
-    bt = delNodeDegree1_1(bt);
+    BTreeNode<int>* tn2 = createTree<int>();
 
-    printInOrder(bt);
-
-    cout << endl << endl;
-
-    cout << "No parent ..." << endl;
-    BTreeNode<int>* bt2 = createTree<int>();
-
-    delNodeDegree1_2(bt2);
-
-    printInOrder(bt2);
-
-    cout << endl;
+    tn2 = inOrderThread2(tn2);
+    printDualList(tn2);
 
     return 0;
 }
 /* 运行结果
-3 6 1 0 7 4 2 8 5
-6 0 7 2 8
+3 6 1 0 7 4 2 8 5  (直接中序遍历输出的二叉树)
+head -> tail:
+3 6 1 0 7 4 2 8 5  (线索化后的顺序遍历)
+head -> tail:
+5 8 2 4 7 0 1 6 3  (线索化后的顺序遍历)
 
-No parent ...
-6 0 7 2 8
+head -> tail:
+3 6 1 0 7 4 2 8 5  (线索化后的顺序遍历)
+head -> tail:
+5 8 2
 */
