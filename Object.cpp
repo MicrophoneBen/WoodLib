@@ -7,7 +7,7 @@ using namespace std;
 namespace WoodLib
 {
 
-void* Object::operator new(unsigned int size) throw()
+void* Object::operator new(size_t size) throw()
 {
     // 编译器会调用这里分配堆内存空间后自动调用相应类的构造函数
     return malloc(size);
@@ -18,7 +18,7 @@ void Object::operator delete(void* p)
     free(p);
 }
 
-void* Object::operator new[](unsigned int size) throw()
+void* Object::operator new[](size_t size) throw()
 {
     // 当用new Test[5]时，只须传入数组元素的个数
     // 编译器会向operator new[](...)函数的参数

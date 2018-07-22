@@ -139,6 +139,74 @@ private:
         }
     }
 
+
+    // 堆排序的功能函数: 返回左孩子结点
+    static int left(int i)
+    {
+        return (2 * i + 1);  // 返回的是二叉树中结点的顺序编号，不是结点中存储的值
+    }
+
+    // 堆排序的功能函数：返回右孩子结点
+    static int right(int i)
+    { 
+        return (2 * i + 2);  // 返回的是二叉树中结点的顺序编号，不是结点中存储的值
+    }
+
+    // 堆排序的功能函数，堆调整：以某一结点（i值）为根的子树做堆调整（保证最大堆性质）
+	// 结点编号从根结点0开始，从左至右依次编号
+    template <typename T>
+    static void HeapAdjust(T array[], int i, int heapSize, bool min2max)
+    {
+        int lf = left(i);
+        int rt = right(i);
+		int largest;
+		
+        T tmp;
+
+        // 比较父结点和左孩子（并将较大者的索引记录下来）
+		// lf < heapSize 阻止数组越界的情况发生
+        if(lf < heapSize && (min2max ? (array[lf] > array[i]) : (array[lf] < array[i])))
+        {
+            largest = lf;
+        }
+        else
+        {
+            largest = i;
+        }
+
+        // 比较父结点和右孩子（并将较大者的索引记录下来）
+        if(rt < heapSize && (min2max ? (array[rt] > array[largest]) :(array[rt] < array[largest]) ))
+        {
+            largest = rt;
+        }
+
+        // 找到父结点与左右孩子三个结点中的最大/小值
+        if(largest != i)   // 发生了交换就进入if
+        {
+            // 将最大/小值与父结点交换
+            tmp = array[i];
+            array[i] = array[largest];
+            array[largest] = tmp;
+            // 交换后导致左右孩子的数值发生变化，对有变化结点（如左孩子）的子树进一步做堆调整。
+            HeapAdjust(array, largest, heapSize, min2max);
+        }
+    }
+
+    // 堆排序的功能函数：创建最大堆
+    template <typename T>
+    static void BuildHeap(T array[], int len, bool min2max)
+    {
+        // 根据给定的数据创建最大堆（不断进行堆调整）
+        for(int i=(len-2)/2; i>=0; i--)
+        {
+            // 注意：从后向前创建堆。
+            // 叶子结点无左右孩子，不必调整。所以
+            // i=(len-2)/2 开始，跳过所有叶子结点
+            HeapAdjust(array, i, len, min2max);     // 对以结点 i 的子树进行堆调整。
+        }
+    }
+
+
 public:
     // 选择排序（O(n*n),不稳定 ） 默认从小到大排序
     // array 要排序的数据 len 排序数据的长度 min2max 从小到大还是从大到小
@@ -277,6 +345,23 @@ public:
     static void quickSort(T array[], int len, bool min2max = true)
     {
         quickSort(array, 0, len - 1, min2max);
+    }
+
+    // 堆排序：外面调用的接口，默认升序排序
+    template <typename T>
+    static void Heap(T array[], int len, bool min2max = true)
+    {
+        BuildHeap(array, len, min2max);   // 创建最大/最小堆
+
+        T tmp;
+
+        for(int i=len-1; i>=0; i--)       // 将根结点与最末尾的结点进行数值交换，在二叉树末尾逐渐形成有序区
+        {
+            tmp = array[0];
+            array[0] = array[i];
+            array[i] = tmp;
+            HeapAdjust(array, 0, i, min2max);
+        }
     }
 };
 

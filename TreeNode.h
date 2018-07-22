@@ -18,7 +18,7 @@ protected:
     TreeNode<T>& operator =(const TreeNode<T>&);
 
     // 重载 new 为私有的，外部不能直接 new 不要忘记加上throw() 失败不让抛出系统异常
-    void* operator new(unsigned int size) throw()
+    void* operator new(size_t size) throw()
     {
         // 调用顶层父类的 new()
         return Object::operator new(size);

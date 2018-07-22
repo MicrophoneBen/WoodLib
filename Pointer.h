@@ -18,7 +18,7 @@ public:
     {
     }
 
-    const T* operator ->() const   // cosnt版本，注意这个返回值也设为const的
+    const T*  operator ->() const   // cosnt版本，注意这个返回值也设为const的
     {
         return m_pointer;
     }
