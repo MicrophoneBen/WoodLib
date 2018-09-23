@@ -1,115 +1,83 @@
-// main.cpp  邻接链表结构的图类模板
+// main.cpp  图的广度优先遍历算法测试
 #include <iostream>
 #include "ListGraph.h"
 #include <exception>
+#include "MatrixGraph.h"
 
 using namespace std;
 using namespace WoodLib;
 
 int main()
 {
-    // 测试的图为前面“ 邻接链表示例 2” 的有向图
-    ListGraph<char, int> g;
+    //MatrixGraph<9, char, int> g;
+    ListGraph<char, int> g(9);
 
-    g.addVertex('A');
-    g.addVertex('B');
-    g.addVertex('C');
-    g.addVertex('D');
-    g.addVertex('F');
+    const char* V = "ABCDEFGHI";
 
-    for(int i=0; i<g.vCount(); i++)
+    for(int i=0; i<9; i++)
     {
-        cout << i <<": " << g.getVertex(i) << endl;
+       g.setVertex(i, V[i]);
     }
 
-    cout << "Delete Vertex F :" << endl;
-    g.removeVertex();      // 将最后一个顶点 F 删除
+    g.setEdge(0, 1, 10);
+    g.setEdge(0, 5, 11);
+    g.setEdge(1, 2, 18);
+    g.setEdge(1, 6, 16);
+    g.setEdge(1, 8, 12);
+    g.setEdge(2, 3, 22);
+    g.setEdge(2, 8, 8);
+    g.setEdge(3, 4, 20);
+    g.setEdge(3, 6, 24);
+    g.setEdge(3, 7, 16);
+    g.setEdge(3, 8, 21);
+    g.setEdge(4, 5, 26);
+    g.setEdge(4, 7, 7);
+    g.setEdge(5, 6, 17);
+    g.setEdge(6, 7, 19);
 
-    for(int i=0; i<g.vCount(); i++)
-    {
-        cout << i <<": " << g.getVertex(i) << endl;
-    }
+    // 构建无向图，所以上面设置了(bigin, end)
+    // 下面再用同样的权值设置一遍(end, begin)
+    g.setEdge(1, 0, 10);
+    g.setEdge(5, 0, 11);
+    g.setEdge(2, 1, 18);
+    g.setEdge(6, 1, 16);
+    g.setEdge(8, 1, 12);
+    g.setEdge(3, 2, 22);
+    g.setEdge(8, 2, 8);
+    g.setEdge(4, 3, 20);
+    g.setEdge(6, 3, 24);
+    g.setEdge(7, 3, 16);
+    g.setEdge(8, 3, 21);
+    g.setEdge(5, 4, 26);
+    g.setEdge(7, 4, 7);
+    g.setEdge(6, 5, 17);
+    g.setEdge(7, 6, 19);
 
-    g.setEdge(0, 1, 5);    // 参数分别为起点、终点和边的权值
-    g.setEdge(0, 3, 8);
-    g.setEdge(1, 2, 8);
-    g.setEdge(2, 3, 2);
-    g.setEdge(3, 1, 9);
 
-    cout <<"vCount: " << g.vCount() << endl;
+    cout <<"vCount: " << g.vCount()<< endl;
     cout <<"eCount: " << g.eCount() << endl;
-    cout <<"ID(1): " << g.ID(1) << endl;
-    cout <<"OD(1): " << g.OD(1) << endl;
-    cout <<"TD(1): " << g.TD(1) << endl;
 
-    cout << "Weight(0, 1): " << g.getEdge(0, 1) << endl;
-    cout << "Weight(0, 3): " << g.getEdge(0, 3) << endl;
-    cout << "Weight(1, 2): " << g.getEdge(1, 2) << endl;
-    cout << "Weight(2, 3): " << g.getEdge(2, 3) << endl;
-    cout << "Weight(3, 1): " << g.getEdge(3, 1) << endl;
+    // 广度优先图遍历算法
+    SharedPointer< Array<int> > sa = g.BFS(0);
 
-    // 获取顶点 0 的邻接顶点
-    SharedPointer<Array<int> > aj = g.getAdjacent(0);
-
-    for(int i=0; i<aj->length(); i++)
+    for(int i=0; i<sa->length(); i++)
     {
-        cout << (*aj)[i] << " ";
+       cout << (*sa)[i] << " ";
     }
     cout << endl;
 
-    cout <<"Delete Edge 0->1 : " << endl;
-    g.removeEdge(0, 1);
-    // cout << "Weight(0, 1): " << g.getEdge(0, 1) << endl; //抛异常，因为该条边被删除了！
-    cout <<"eCount: " << g.eCount() << endl;
-    // 再获取顶点 0 的邻接顶点
-    aj = g.getAdjacent(0);
-
-    for(int i=0; i<aj->length(); i++)
+    for(int i=0; i<sa->length(); i++)
     {
-        cout << (*aj)[i] << " ";
+       cout << g.getVertex((*sa)[i]) << " ";
     }
+
     cout << endl;
-
-    // 将上面删除的边又设置一个新值
-    g.setEdge(0, 1, 100);
-    cout << "Weight(0, 1): " << g.getEdge(0, 1) << endl;
-
-    // 重新设置顶点值
-    g.setVertex(0, 'F');
-    cout << "v(0): " << g.getVertex(0) << endl;
-
-    // 删除最近加入的顶点（编号最大的 3 号顶点，注意会同时删除与该顶点相关的边）
-    g.removeVertex();
-    cout <<"eCount: " << g.eCount() << endl;
 
     return 0;
 }
 /* 运行结果
-0: A
-1: B
-2: C
-3: D
-4: F
-Delete Vertex F :
-0: A
-1: B
-2: C
-3: D
-vCount: 4
-eCount: 5
-ID(1): 2
-OD(1): 1
-TD(1): 3
-Weight(0, 1): 5
-Weight(0, 3): 8
-Weight(1, 2): 8
-Weight(2, 3): 2
-Weight(3, 1): 9
-1 3                // 顶点0的邻接顶点
-Delete Edge 0->1 :
-eCount: 4
-3                  // 删除边0->1后顶点0的邻接顶点
-Weight(0, 1): 100
-v(0): F
-eCount: 2
+vCount: 9
+eCount: 30
+0 1 5 2 6 8 4 3 7    // 图顶点编号
+A B F C G I E D H    // 图顶点内的数据
 */

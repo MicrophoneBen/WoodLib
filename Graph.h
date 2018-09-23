@@ -5,6 +5,8 @@
 #include "Object.h"
 #include "SharedPointer.h"
 #include "Array.h"
+#include "DynamicArray.h"
+#include "LinkQueue.h"
 
 namespace WoodLib
 {
@@ -13,6 +15,30 @@ namespace WoodLib
 template <typename V, typename E>
 class Graph : public Object
 {
+protected:
+    // 注意传参一定要用引用，否则报段错误的异常
+    template <typename T>
+    DynamicArray<T>* queueToArray(LinkQueue<T>& queue)
+    {
+        DynamicArray<T>* ret = new DynamicArray<T>(queue.length());
+
+        if(ret != NULL)
+        {
+            for(int i=0; i<ret->length(); i++)
+            {
+                // 将数组元素设置为队头元素，再队头元素出队
+                ret->set(i, queue.front());
+                queue.deQueue();
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(NotEnoughMemoryException, "No memory to create ret object ...");
+        }
+
+        return ret;
+    }
+
 public:
     virtual V getVertex(int i) = 0;                              // 获取顶点i的值
     virtual bool getVertex(int i, V& value) = 0;                 // 获取顶点i的值
@@ -35,6 +61,67 @@ public:
     virtual int TD(int i)        // 获取顶点 i 的度
     {
         return ID(i) + OD(i);
+    }
+
+    // 广度优先遍历：参数i为起始顶点，返回值为遍历时访问的顶点的数组
+    SharedPointer< Array<int> > BFS(int i)
+    {
+        DynamicArray<int>* ret = NULL;
+
+        if((0 <= i) && (i < vCount()))
+        {
+            LinkQueue<int> q;
+            LinkQueue<int> r;   // return 队列
+
+            DynamicArray<bool> visited(vCount());  // 顶点是否被访问过的标记数组
+
+            for(int i=0; i<visited.length(); i++)
+            {
+                visited[i] = false;
+            }
+
+            // 1.将起始顶点加入队列中
+            q.enQueue(i);
+
+            while (q.length() > 0)
+            {
+                int v = q.front();   // 队头元素
+
+                // 2.队头元素出队列，并判断队头元素是否被访问过
+                q.deQueue();
+                if(!visited[v])
+                {
+                    // 3. 将顶点v标访为己访问过，并将v的邻接顶点压入q队列中
+                    visited[v] = true;
+
+                    SharedPointer< Array<int> > aj = getAdjacent(v);
+
+                    // 遍历这些邻接顶点
+                    for(int i=0; i<aj->length(); i++)
+                    {
+                        int k = (*aj)[i];
+
+                        // 未被访问过的，则加入q队列
+                        // 这个地方与唐佐林讲的不一样，唐佐林的是在r队列中过滤
+                        // 这里是直接在q队列中过滤掉已经访问的顶点
+                        if(!visited[k])
+                        {
+                            q.enQueue(k);
+                        }
+                    }
+                    // 将v压入返回值的r队列中
+                    r.enQueue(v);
+                }
+            }
+            // 将队列转换为数组
+            ret = queueToArray(r);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Index i is invalid ...");
+        }
+
+        return ret;
     }
 };
 
