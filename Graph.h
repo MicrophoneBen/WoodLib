@@ -12,6 +12,29 @@
 namespace WoodLib
 {
 
+// 边相关的数据类型
+template <typename E>
+struct Edge : public Object
+{
+    int begin;   // 起点
+    int end;     // 终点
+    E data;      // 权值
+
+    Edge(int b = -1, int e = -1) : begin(b), end(e) {}
+    Edge(int b, int e, const E& value) : begin(b), end(e), data(value) {}
+
+    // 用于查找时比较用，一定不可少
+    bool operator == (const Edge<E>& rhs)
+    {
+        return (begin == rhs.begin) && (end == rhs.end);
+    }
+
+    bool operator != (const Edge<E>& rhs)
+    {
+        return !(*this == rhs);
+    }
+};
+
 // V 为顶点的数据类型，E 为边的数据类型
 template <typename V, typename E>
 class Graph : public Object
@@ -44,6 +67,29 @@ public:
     virtual V getVertex(int i) = 0;                         // 获取顶点i的值
     virtual bool getVertex(int i, V& value) = 0;            // 获取顶点i的值
     virtual bool setVertex(int i, const V& value) = 0;      // 设置顶点i的值
+
+    // 判断是否可看做无向图
+    bool asUndirected()
+    {
+        bool ret = true;
+
+        for(int i=0; i<vCount() && ret; i++)
+        {
+            for(int j=0; j<vCount() && ret; j++)
+            {
+                // 判断i和j互为邻接顶点且<i,j>和<j,i>边的权值相等
+                if(isAdjacent(i, j))
+                {
+                    ret = ret && isAdjacent(j, i) && (getEdge(i, j) == getEdge(j, i));
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    // 判断图中顶点i到顶点j是否邻接
+    virtual bool isAdjacent(int i, int j) = 0;
 
     // 获取顶点 i 的邻接顶点
     virtual SharedPointer< Array<int> > getAdjacent(int i) = 0;
@@ -189,6 +235,97 @@ public:
         }
 
         return ret;
+    }
+
+    // Prim算法(求最小/大生成树)
+    // LIMIT 理想的极限值，最小树则传最大值，最大树则传最小值0
+    // true时找最小生成树，false找最大生成树，默认最小生成树
+    SharedPointer< Array< Edge<E> > > prim(const E& LIMIT, const bool MINORMAX = true)
+    {
+        LinkQueue< Edge<E> > ret;
+
+        // prim算法只能用于无向图，这里判断是无向图
+        if(asUndirected())
+        {
+            // 1.准备工作
+            DynamicArray<bool> mark(vCount());  // 标记顶点所属的集合（T or F）
+            DynamicArray<E> cost(vCount());     // 记录T集合到F集合中顶点的最小权值
+            DynamicArray<int> adjVex(vCount()); // 记录cost中权值时的对应顶点
+
+            SharedPointer< Array<int> > aj = NULL; // 标记某个顶点的邻接顶点
+            bool end = false;     // 是否中断执行
+            int v = 0;            // 从0号顶点开始查找最小生成树
+
+            for(int i=0; i<vCount(); i++)
+            {
+                mark[i] = false;
+                cost[i] = LIMIT;  // LIMIT为最值(最小数则这个数就是个理想的最大值)
+                adjVex[i] = -1;
+            }
+
+            // 2.对初始化顶点v进行操作
+            mark[v] = true;     // v加入最小生成树（T集合），生成T0树
+            aj = getAdjacent(v);
+
+            for(int i=0; i<aj->length(); i++)
+            {
+                // 更新各顶点到T0树的矩离，及记录各顶点通过哪个顶点靠近T0树
+                int t = (*aj)[i];
+                cost[t] = getEdge(v, t); // 获取边的权值并加入cost数组
+                adjVex[t] = v;           // t顶点通过T集合中的v顶点靠近树
+            }
+
+            // 3.继续扩展最小/大生成树
+            for(int i=0; (i<vCount() && !end); i++)
+            {
+                E mCost = LIMIT;
+                int k = -1;
+
+                // 从F集合中选择权值最小的边，并将所对应的顶点（未标记）加入到T集合
+                for(int j=0; j<vCount(); j++)
+                {
+                    if(!mark[j] && (MINORMAX ? (cost[j] < mCost) : (cost[j] > mCost)))
+                    {
+                        mCost = cost[j];
+                        k = j;
+                    }
+                }
+
+                end = (-1 == k);  // 如果无法找到最小权值的边，则算法结束
+
+                if(!end)
+                {
+                    // 找到权值最小的边，将该边加入到ret队列
+                    ret.enQueue(Edge<E>(adjVex[k], k, getEdge(adjVex[k], k)));
+                    mark[k] = true;
+                    aj = getAdjacent(k);
+
+                    // 更新其余未标记顶点到新树的最近矩离（实际上只需更新与k相连的顶点即可）
+                    for(int j=0; j<aj->length(); j++)
+                    {
+                        int t = (*aj)[j];
+                        if(!mark[t] && (MINORMAX ? (getEdge(t, k) < cost[t]) : (getEdge(t, k) > cost[t])))
+                        {
+                            cost[t] = getEdge(t, k);
+                            adjVex[t] = k;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidOperationException, "Prim operation is for undirected graph only ...");
+        }
+
+        // n个顶点的图需要n-1条边才能够生成最小生成树
+        if(ret.length() != (vCount() -1))
+        {
+            // 出现这种情况则说明图中有孤立的顶点没有与其他任何顶点邻接
+            THROW_EXCEPTION(InvalidOperationException, "No enough edge for Prim operation ...");
+        }
+
+        return queueToArray(ret);
     }
 };
 

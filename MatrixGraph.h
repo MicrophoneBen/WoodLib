@@ -146,6 +146,14 @@ public:
         return ret;
     }
 
+    // 判断图中顶点i到顶点j是否邻接
+    bool isAdjacent(int i, int j)
+    {
+        return  ((0 <= i) && (i < vCount())) &&
+                ((0 <= j) && (j < vCount())) &&
+                (m_edges[i][j] != NULL);
+    }
+
     // 获取顶点 i 的邻接顶点
     SharedPointer< Array<int> > getAdjacent(int i)
     {

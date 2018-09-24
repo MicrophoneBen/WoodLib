@@ -9,30 +9,6 @@
 
 namespace WoodLib
 {
-
-// 边相关的数据类型
-template <typename E>
-struct Edge : public Object
-{
-    int begin;   // 起点
-    int end;     // 终点
-    E data;      // 权值
-
-    Edge(int b = -1, int e = -1) : begin(b), end(e) {}
-    Edge(int b, int e, const E& value) : begin(b), end(e), data(value) {}
-
-    // 用于查找时比较用，一定不可少
-    bool operator == (const Edge<E>& rhs)
-    {
-        return (begin == rhs.begin) && (end == rhs.end);
-    }
-
-    bool operator != (const Edge<E>& rhs)
-    {
-        return !(*this == rhs);
-    }
-};
-
 // V 为顶点类型， E 为边类型
 template <typename V, typename E>
 class ListGraph : public Graph<V, E>
@@ -193,6 +169,21 @@ public:
             THROW_EXCEPTION(InvalidOperationException, "No vertex in current graph ...");
         }
 
+    }
+
+    // 判断图中顶点i到顶点j是否邻接
+    bool isAdjacent(int i, int j)
+    {
+        bool ret = (0 <= i) && (i < vCount()) &&
+                   (0 <= j) && (j < vCount());
+
+        if(ret)
+        {
+            Vertex* v = m_vertList.get(i);
+            ret = ret && ( v->edge.find(Edge<E>(i, j)) >= 0);
+        }
+
+        return ret;
     }
 
     // 获取顶点 i 的邻接顶点
@@ -396,5 +387,5 @@ public:
 
 }
 
-#endif // LISTGRAPH_H
+#endif
 
