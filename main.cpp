@@ -1,4 +1,4 @@
-// main.cpp  图的广度优先遍历算法测试
+// main.cpp  图的深度优先遍历算法测试
 #include <iostream>
 #include "ListGraph.h"
 #include <exception>
@@ -6,6 +6,50 @@
 
 using namespace std;
 using namespace WoodLib;
+
+// 递归版的深度优先遍历
+template<typename V, typename E>
+void DFS(Graph<V, E>&g ,int v, Array<bool>& visited)
+{
+    if((0<=v) && (v<g.vCount()))
+    {
+        cout << g.getVertex(v) << " ";    // 1. 访问顶点
+        visited[v] = true;
+
+        // 2. 获取v的邻接顶点
+        SharedPointer<Array<int> > aj = g.getAdjacent(v);
+
+        // 3. 以v的邻接顶点为起点，遍历未被访问过的子图。
+        //    visited数组除了用于标志顶点是否被访问，也可以用于将未被访问过的
+        //    顶点划分入一个子图。
+        // 没有邻接顶点时为递归出口，此时 aj->length() = 0; for循环不执行
+        for(int i=0; i<aj->length(); i++)
+        {
+            if(!visited[(*aj)[i]])
+            {
+                DFS(g, (*aj)[i], visited);
+            }
+        }
+    }
+    else
+    {
+        THROW_EXCEPTION(InvalidParameterException, "Index v is invalid ...");
+    }
+}
+
+template<typename V, typename E>
+void DFS(Graph<V, E>&g ,int v)
+{
+    DynamicArray<bool> visited(g.vCount());
+
+    for(int i=0; i<visited.length(); i++)
+    {
+        visited[i] = false;
+    }
+
+    DFS(g, v, visited);
+}
+
 
 int main()
 {
@@ -57,14 +101,8 @@ int main()
     cout <<"vCount: " << g.vCount()<< endl;
     cout <<"eCount: " << g.eCount() << endl;
 
-    // 广度优先图遍历算法
-    SharedPointer< Array<int> > sa = g.BFS(0);
-
-    for(int i=0; i<sa->length(); i++)
-    {
-       cout << (*sa)[i] << " ";
-    }
-    cout << endl;
+    // 深度优先图遍历算法
+    SharedPointer< Array<int> > sa = g.DFS(0);
 
     for(int i=0; i<sa->length(); i++)
     {
@@ -73,11 +111,15 @@ int main()
 
     cout << endl;
 
+    DFS(g, 0);   // 调用递归版本的深度优先遍历算法
+
+    cout << endl;
+
     return 0;
 }
 /* 运行结果
 vCount: 9
 eCount: 30
-0 1 5 2 6 8 4 3 7    // 图顶点编号
-A B F C G I E D H    // 图顶点内的数据
+A B C D E F G H I  // 图顶点内的数据 -- 非递归版本 链式栈的方式
+A B C D E F G H I  // 图顶点内的数据 -- 递归版本
 */
