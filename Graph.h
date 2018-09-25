@@ -400,8 +400,8 @@ public:
         LinkQueue< Edge<E> > ret;     // ret 队列
         // 无向图边集
         SharedPointer< Array< Edge<E> > > edges = getUndirectedEdges();
-		// 前驱标记数组：用于判断新选择的边是否构成回路
-        DynamicArray<int> prev(vCount());  
+        // 前驱标记数组：用于判断新选择的边是否构成回路
+        DynamicArray<int> prev(vCount());
 
         for(int i=0; i<prev.length(); i++)
         {
@@ -436,6 +436,109 @@ public:
 
         return queueToArray(ret);
     }
+
+    // Dijkstra 算法（求最短路径的）
+    SharedPointer< Array<int> > dijkstra(int i, int j, const E& LIMIT)
+    {
+        LinkQueue<int> ret;  // 记录从 i 到 j 的最短路径上的顶点
+
+        if((0 <= i) && (i < vCount()) && (0 <= j) && (j < vCount()))
+        {
+            // 1.准备工作
+            DynamicArray<int> path(vCount());      // 每个顶点其最短路径上的前驱顶点
+            DynamicArray<bool> mark(vCount());     // 标记顶点所属的集合（S or F）
+            DynamicArray<E> dist(vCount());        // dist[i] 为顶点i距源点的最短距离
+            SharedPointer< Array<int> > aj = NULL; // 标记某个顶点的邻接顶点
+
+            for(int k=0; k<vCount(); k++)
+            {
+                path[k] = -1;
+                mark[k] = false;
+                // 逗号运算符的运用，一语双关
+                dist[k] = isAdjacent(i, k) ? (path[k] = i, getEdge(i, k)) : LIMIT;
+
+                // 下面这条问题语句，导致每次dist[k] = LIMIT而产生bug
+                // 真是一个字母大意写错，就天壤之别！！！
+                // dist[k] = isAdjacent(i, j) ? (path[k] = i, getEdge(i, k)) : LIMIT;
+            }
+
+            // 2.标记 i 为源点
+            mark[i] = true;  // 标记 i 为源点
+
+            // 3.查找从顶点i到各个顶点的最短路径
+            for(int k=0; k<vCount(); k++)
+            {
+                E mDist = LIMIT;
+                int u = -1;
+
+                // 从未标记集合中选择距源点Vi最近的顶点
+                for(int w=0; w<vCount(); w++)
+                {
+                    if(!mark[w] && (dist[w] < mDist))
+                    {
+                        mDist = dist[w];
+                        u = w;
+                    }
+                }
+
+                // 不存在这样的边，算法退出
+                if(-1 == u)
+                {
+                    break;
+                }
+
+                // 能够执行到这里说明存在这样的边
+
+                // 将这个最近的顶点标记进入S集合
+                mark[u] = true;
+
+                aj = getAdjacent(u);
+
+                // 只需要更新u的邻接顶点的dist值
+				// 这个地方与唐佐林做法不一样，自认为这个更好
+                for(int k=0; k<aj->length(); k++)
+                {
+                    int w = (*aj)[k];
+
+                    if(!mark[w] && ((dist[u] + getEdge(u, w)) < dist[w]))
+                    {
+                        dist[w] = dist[u] + getEdge(u, w);
+                        path[w] = u;
+                    }
+                }
+
+            }
+
+            // 由于 path 数组记录路径上每个顶点的前驱顶点（逆序的）,用栈来反转一下顺序
+            LinkStack<int> s;
+            s.push(j);         // 终点最先压入栈中,最后弹出
+
+            for(int k=path[j]; k!=-1; k=path[k])
+            {
+                s.push(k);
+            }
+
+            // 将栈转换为队列
+            while(s.size() > 0)
+            {
+                ret.enQueue(s.top());
+                s.pop();
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Index i or j is invalid ...");
+        }
+
+        // 最短路径上至少应有两个顶点
+        if(ret.length() < 2)
+        {
+            THROW_EXCEPTION(ArithmeticException, "These is no path from i to j ...");
+        }
+
+        return queueToArray(ret);
+    }
+
 };
 
 }
