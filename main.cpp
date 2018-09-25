@@ -1,4 +1,5 @@
-// main.cpp  图的最小生成树算法设计
+// main.cpp  图的最小生成树kruskal算法设计
+// 与上节代码测试一样，只需将对 prim 函数的调用改为 kruskal
 #include <iostream>
 #include "ListGraph.h"
 #include <exception>
@@ -54,8 +55,10 @@ int main()
     cout <<"vCount: " << g.vCount()<< endl;
     cout <<"eCount: " << g.eCount() / 2 << endl;
 
-    //SharedPointer< Array< Edge<int> > > sa = g.prim(65535);  //最小生成树
-    SharedPointer< Array< Edge<int> > > sa = g.prim(0,false);  //最大生成树
+
+    SharedPointer< Array< Edge<int> > > sa = g.krusal();       //最小生成树
+    //SharedPointer< Array< Edge<int> > > sa = g.krusal(false);  //最大生成树
+
 
     int w = 0;
     for(int i=0; i<sa->length(); i++)
@@ -73,26 +76,26 @@ int main()
 // 最小生成树结果：
 vCount: 9
 eCount: 15
+4->7: 7
+2->8: 8
 0->1: 10
 0->5: 11
 1->8: 12
-8->2: 8
 1->6: 16
+3->7: 16
 6->7: 19
-7->4: 7
-7->3: 16
 Weight: 99
 
 // 最大生成树结果：
 vCount: 9
 eCount: 15
-0->5: 11
-5->4: 26
-4->3: 20
+4->5: 26
 3->6: 24
-3->2: 22
+2->3: 22
 3->8: 21
+3->4: 20
 6->7: 19
-2->1: 18
+1->2: 18
+0->5: 11
 Weight: 161
 */

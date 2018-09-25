@@ -33,6 +33,27 @@ struct Edge : public Object
     {
         return !(*this == rhs);
     }
+
+    // 用于排序时比较用，一定不可少
+    bool operator > (const Edge<E>& rhs)
+    {
+        return (data > rhs.data);
+    }
+
+    bool operator < (const Edge<E>& rhs)
+    {
+        return (data < rhs.data);
+    }
+
+    bool operator >= (const Edge<E>& rhs)
+    {
+        return (data >= rhs.data);
+    }
+
+    bool operator <= (const Edge<E>& rhs)
+    {
+        return (data <= rhs.data);
+    }
 };
 
 // V 为顶点的数据类型，E 为边的数据类型
@@ -61,6 +82,50 @@ protected:
         }
 
         return ret;
+    }
+
+    // 获取无向图的边集 -- for kruskal算法
+    SharedPointer< Array< Edge<E> > > getUndirectedEdges()
+    {
+        DynamicArray< Edge<E> >* ret = NULL;
+
+        if(asUndirected())
+        {
+            LinkQueue< Edge<E> > queue;
+
+            // 双重for循环，对每个顶点进行边的遍历
+            for(int i=0; i<vCount(); i++)
+            {
+                for(int j=0; j<vCount(); j++)
+                {
+                    if(isAdjacent(i, j))
+                    {
+                        queue.enQueue(Edge<E>(i, j, getEdge(i, j)));
+                    }
+                }
+            }
+
+            ret = queueToArray(queue);
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidOperationException, "This function is for undirected graph only ...");
+        }
+
+        return ret;
+    }
+
+    // kruskal 回路判断
+    // prev 前驱标记数组，v前驱标记数组的下标
+    int find(Array<int>& prev, int v)
+    {
+        // 前驱标记数组不为-1
+        while (prev[v] >= 0)
+        {
+            v = prev[v];
+        }
+
+        return v;
     }
 
 public:
@@ -239,7 +304,7 @@ public:
 
     // Prim算法(求最小/大生成树)
     // LIMIT 理想的极限值，最小树则传最大值，最大树则传最小值0
-    // true时找最小生成树，false找最大生成树，默认最小生成树
+    // MINORMAX 为true时找最小生成树，为false找最大生成树，默认最小生成树
     SharedPointer< Array< Edge<E> > > prim(const E& LIMIT, const bool MINORMAX = true)
     {
         LinkQueue< Edge<E> > ret;
@@ -323,6 +388,50 @@ public:
         {
             // 出现这种情况则说明图中有孤立的顶点没有与其他任何顶点邻接
             THROW_EXCEPTION(InvalidOperationException, "No enough edge for Prim operation ...");
+        }
+
+        return queueToArray(ret);
+    }
+
+    // Krusal 算法(求最小/大生成树)
+    // MINORMAX 为true时找最小生成树，为false找最大生成树，默认最小生成树
+    SharedPointer< Array< Edge<E> > > krusal(const bool MINORMAX = true)
+    {
+        LinkQueue< Edge<E> > ret;     // ret 队列
+        // 无向图边集
+        SharedPointer< Array< Edge<E> > > edges = getUndirectedEdges();
+		// 前驱标记数组：用于判断新选择的边是否构成回路
+        DynamicArray<int> prev(vCount());  
+
+        for(int i=0; i<prev.length(); i++)
+        {
+            prev[i] = -1;     // n个顶点的图初始化为n课树
+        }
+
+        // 将边权值排序：求最小生成树时，升序；最大生成树时降序
+        edges->bubbleSort(MINORMAX);
+
+        // n 个顶点的图 最小生成树最多有 n-1 条边
+        for(int i=0; (i<edges->length()) && (ret.length()<vCount()-1); i++)
+        {
+            Edge<E>& edge = (*edges)[i];
+
+            // 判断该边的两端的顶点是否位于不同的棵中
+            int begin = find(prev, edge.begin);
+            int end   = find(prev, edge.end);
+
+            // 不存在回路
+            if(begin != end)
+            {
+                prev[end] = begin;
+                ret.enQueue(edge);   // 队列数量最多可到 vCount() - 1
+            }
+        }
+
+        // 边数不够，则无法构成最小生成树
+        if(ret.length() != (vCount() -1))
+        {
+            THROW_EXCEPTION(InvalidOperationException, "No enough edges for Krusal operation ...");
         }
 
         return queueToArray(ret);
