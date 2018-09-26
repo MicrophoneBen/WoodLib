@@ -539,6 +539,87 @@ public:
         return queueToArray(ret);
     }
 
+    // floyd 算法（求从顶点i到j的最短路径）
+    SharedPointer< Array<int> > floyd(int i, int j, const E& LIMIT)
+    {
+        LinkQueue<int> ret;
+
+        if((0 <= i) && (i < vCount()) && (0 <= j) && (j < vCount()))
+        {
+            // 定义二维数组dist，并且第一维大小为vCount(), 第二维为DynamicArray构造的默认值0
+            DynamicArray< DynamicArray<int> > dist(vCount());  // 权值矩阵
+            DynamicArray< DynamicArray<int> > path(vCount());  // 路径矩阵
+
+            // 将上面的定义的二维数组的第二维也设置为 vCount()
+            for(int k=0; k<vCount(); k++)
+            {
+                dist[k].resize(vCount());
+                path[k].resize(vCount());
+            }
+
+            // 初始化
+            for(int i=0; i<vCount(); i++)
+            {
+                for(int j=0; j<vCount(); j++)
+                {
+                    // path[i][j]表示：i到j的路径上源点i的后继顶点，即i后面的第1个顶点
+                    path[i][j] = -1;
+                    // i与j之间有连接，则更新path[i][j]记录路径，同时更新dist[i][j]记录权值
+                    dist[i][j] = isAdjacent(i, j) ? (path[i][j] = j, getEdge(i, j)) : LIMIT;
+                }
+            }
+
+            // 关键代码:本质是通过中转顶点寻找更短的路径
+            // 从 i 到 j 的路径上分别插入 V0,V1, ... Vn 顶点来中转
+            for(int k=0; k<vCount(); k++)
+            {
+                // vi->vk->vj：将任意两点经 Vk 中转的最短距离求出
+                for(int i=0; i<vCount(); i++)
+                {
+                    for(int j=0; j<vCount(); j++)
+                    {
+                        if(dist[i][k] + dist[k][j] < dist[i][j])
+                        {
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                            // i→j 最短路径与i→k最短路径是重合的，所以i的后继顶点应该是一样的
+                            path[i][j] = path[i][k];
+                        }
+                    }
+                }
+            }
+
+            int k = path[i][j];
+            ret.enQueue(i);       // 起点
+
+            // 读取路径中途经过的顶点: (k != j 表示获取中转点，不包含终点)
+            while((k != -1) && (k != j))
+            {
+                // i->j 经过的第 1 个中转点为path[i][j]，即 k
+                ret.enQueue(k);
+                // 剩余的路径为从 k->j，而该路径的第1 个中转点为 path[k][j]，
+                // 即整条路径的第 2 个中转点，以此类推下去...
+                k = path[k][j];
+            }
+
+            if(k != -1)
+            {
+                ret.enQueue(k);    // 终点
+            }
+        }
+        else
+        {
+            THROW_EXCEPTION(InvalidParameterException, "Index i or j is invalid ...");
+        }
+
+        // 最短路径上至少应有两个顶点
+        if(ret.length() < 2)
+        {
+            THROW_EXCEPTION(ArithmeticException, "These is no path from i to j ...");
+        }
+
+        return queueToArray(ret);
+    }
+	
 };
 
 }

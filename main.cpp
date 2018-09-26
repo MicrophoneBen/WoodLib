@@ -1,4 +1,4 @@
-// main.cpp  图的最短路径 dijkstra 算法设计测试
+// main.cpp  图的最短路径 floyd 算法设计测试
 #include <iostream>
 #include "ListGraph.h"
 #include "MatrixGraph.h"
@@ -56,8 +56,8 @@ int main()
 
     int begin = 0, end = 7;  // 起点和终点
 
-    // 图的最短路径算法
-    SharedPointer<Array<int> > sa = g.dijkstra(begin, end, 65536);
+    // 图的最短路径算法 floyd()
+    SharedPointer<Array<int> > sa = g.floyd(begin, end, 65536);
 
     int w = 0;
     cout << begin << "->" << end << " shortest path: ";
